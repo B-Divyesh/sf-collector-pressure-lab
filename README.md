@@ -7,6 +7,8 @@ a loopback OTLP/HTTP endpoint at stepped rates, samples optional Collector
 self-metrics, classifies the first pressure threshold, and prints tuning
 hypotheses. It never edits the configuration.
 
+Documentation and the offline model: https://collector-pressure-lab.sociobot.in
+
 Synthetic results are directional, not production capacity guarantees. Run the
 lab against an isolated local Collector, never a production endpoint.
 

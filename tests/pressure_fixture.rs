@@ -28,7 +28,7 @@ impl Fixture {
                         let _ = stream.read(&mut request);
                         thread::sleep(delay);
                         let number = count.fetch_add(1, Ordering::Relaxed) + 1;
-                        let failed = fail_every.is_some_and(|every| number % every == 0);
+                        let failed = fail_every.is_some_and(|every| number.is_multiple_of(every));
                         let status = if failed { "503 Busy" } else { "200 OK" };
                         let response = format!(
                             "HTTP/1.1 {status}\r\nContent-Length: 2\r\nConnection: close\r\n\r\n{{}}"

@@ -1,0 +1,2 @@
+{"resourceSpans":[{"resource":{"attributes":[{"key":"service.name","value":{"stringValue":"pressure-lab-fixture"}}]},"scopeSpans":[]}]}
+{"resourceSpans":[{"resource":{"attributes":[{"key":"burst.sequence","value":{"intValue":"2"}}]},"scopeSpans":[]}]}

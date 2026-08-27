@@ -1,5 +1,16 @@
 # Collector Pressure Lab — build handoff
 
+> ## Independent verification status — FAIL
+>
+> Verified 2026-08-27 against candidate
+> `b40585a791017c14cb00247ca27e193da8a23af3` and the live deployment. Do not
+> release this candidate: a local receiver that returns HTTP 503 for every
+> replayed request exits 3 without a `drops` report, even though complete
+> telemetry loss is a required pressure outcome. Live hashed CSS/JS also have
+> `cache-control: public, must-revalidate, max-age=30`, not the intended
+> immutable cache policy. Full evidence and exact reproduction are in
+> `.factory/verification.md`.
+
 Work order: `collector-pressure-lab-build-1`
 
 Version: `0.1.0`

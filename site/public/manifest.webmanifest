@@ -1,0 +1,10 @@
+{
+  "name": "Collector Pressure Lab",
+  "short_name": "Pressure Lab",
+  "description": "Offline queue-pressure explainer and CLI documentation.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#101b20",
+  "theme_color": "#101b20",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

@@ -2,6 +2,14 @@
 //!
 //! The public API is deliberately small: inspect a Collector config, load a
 //! bounded local sample, then run an [`Experiment`] against an HTTP endpoint.
+//!
+//! ```
+//! use collector_pressure_lab::parse_config;
+//!
+//! let summary = parse_config("exporters:\n  otlp:\n    sending_queue:\n      enabled: true\n      queue_size: 2048\n");
+//! assert_eq!(summary.sending_queue_enabled, Some(true));
+//! assert_eq!(summary.queue_size, Some(2048));
+//! ```
 
 use serde::Serialize;
 use std::collections::BTreeMap;

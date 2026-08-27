@@ -1,0 +1,12 @@
+{
+  "slug": "collector-pressure-lab",
+  "title": "Collector Pressure Lab",
+  "territory": "devtools-data",
+  "user": "A self-hosting engineer running OpenTelemetry who needs to know whether a collector configuration will queue, shed, or overload under bursty telemetry before a production incident.",
+  "smallest_useful_product": "CLI loads a Collector config and a bounded OTLP/OTLP-like traffic sample, replays configurable bursts against a local collector, records queue/latency/drop behavior, and emits tuning hypotheses.",
+  "success_measure": "For a controlled slow-exporter fixture, it correctly classifies backpressure versus drops and reports the threshold within 20% of measured throughput.",
+  "artifact_class": "cli",
+  "monetization": "free",
+  "constraints": "Default to loopback-only test endpoints; keep telemetry samples local; warn that synthetic results are not production capacity guarantees; honor OpenTelemetry component licenses.",
+  "state": "RESEARCHED"
+}

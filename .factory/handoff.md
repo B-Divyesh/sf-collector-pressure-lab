@@ -1,36 +1,58 @@
-# Collector Pressure Lab — polish 4 handoff
+# Collector Pressure Lab — review 5 handoff
 
-Work order: `collector-pressure-lab-polish-4`
-Reviewed base: `2c0707cea8d10e46374cf315588e5d8e897024e0`
-Review repaired: `a3f7acd8ddbc1e99111904e182fa0c7b9837c93a`
-Product repair: `01b34eedc57c5a74cee94649540ed122dfc8c300`
+Work order: `collector-pressure-lab-review-5`
+
+Reviewed source: `809999e510b963e5cba165c7a059aa5d73e52ec9`
+
 Live URL: <https://collector-pressure-lab.sociobot.in/>
 
-## Status: complete
+## Status: review complete, product FAIL
 
-The final untested factual promise is repaired. `Free to use.` is now declared as the exact `free-to-use` claim and has one clean-state tagged Playwright test. It visits home, demo, privacy, and terms; confirms the free statements; rejects paid-tier, price, billing, payment, and login affordances; records same-origin-only requests; and scans the browser source for billing or payment runtimes.
+No product code was changed. The full adversarial review is in
+`.factory/review-5.md`.
 
-The release was built with the work-order command `npm ci && npm run build:site` and deployed directly to Azure Static Web Apps production (`sf-collector-pressure-lab`, resource group `sociobot`) from `dist/site`. The public root returned `build polish-4` after deployment.
+The first blocker: fresh `/demo` opens with 700/450/1500/8, while **Reset
+demo** changes to 900/400/1200/10. The documented sample is 900/420/1200/10;
+420 is not representable by the export slider's 50-unit step. The
+`demo-isolation` test passes because it checks only the post-reset arrival
+rate. This reopens the reset portion of F-1-2 as F-5-1.
 
-## Exact verification evidence
+The second blocker: demo changes survive navigation through the wordmark or
+Privacy and survive closing/reopening the page. Only **Start for real** clears
+the key, contrary to the privacy and sandbox leave contract (F-5-2/F-1-2).
 
-- Fresh clone: `/tmp/cplab-polish4-clean.PG89Ev` at `01b34ee`; `npm ci` completed with 0 vulnerabilities.
-- Every manifest command ran independently and passed: `demo-isolation`, `free-to-use`, `offline-reload`, `browser-no-network-or-storage`, `loopback-guard`, `bounded-replay`, `config-inspection`, `classification`, `collector-metrics`, `cli-data-boundary`, `no-config-write`, `package-and-tests`, `no-third-party-runtime`, `legal-and-site-links`, and `threshold-accuracy`.
-- `npm test` passed in that clone: 4 Rust unit tests, 4 CLI contract tests, 3 pressure fixtures, 1 doctest, 6 Vitest tests, and 50 Playwright checks. It covers the unit, integration, build, browser, accessibility, privacy, service-worker, and offline paths.
-- `cargo fmt --check`, `cargo clippy --all-targets --all-features -- -D warnings`, and `cargo package --allow-dirty` passed. The created package is `target/package/collector-pressure-lab-0.1.0.crate`.
-- Required live URL verifier passed with HTTP 200, no console errors, one title, `lang="en"`, one `h1`, one `main`, and zero images missing `alt`: [verify.json](evidence/polish-4/live/verify.json).
-- Cold live browser audit passed at 390 × 844 and 1440 × 900. It checks every public route, query demo, missing-route 404, metadata, CSP, Permissions Policy, target sizes, overflow, forward/back/hash focus, isolated demo reset/exit, same-origin requests, and offline reload: [product-check.json](evidence/polish-4/live/product-check.json).
-- Axe returned zero serious or critical violations on `/`, `/demo`, `/?demo=1`, `/privacy/`, `/terms/`, and `/404` at both viewports. This is recorded per route in [product-check.json](evidence/polish-4/live/product-check.json).
-- Live mobile Lighthouse: Performance 100, Accessibility 100, Best Practices 100, SEO 100; LCP 1.35 s, CLS 0, TBT 0 ms: [lighthouse.json](evidence/polish-4/live/lighthouse.json).
-- Screenshots: [mobile first screen](evidence/polish-4/live/first-screen-mobile.png), [desktop first screen](evidence/polish-4/live/first-screen-desktop.png), [mobile demo](evidence/polish-4/live/demo-mobile.png), [desktop demo](evidence/polish-4/live/demo-desktop.png), [mobile query demo](evidence/polish-4/live/demo-query-mobile.png), and [desktop query demo](evidence/polish-4/live/demo-query-desktop.png).
+The third blocker: the designed 404 and unknown-route document omit `og:url`.
+This leaves F-1-7 half-fixed and reopens it as F-5-3.
 
-## Product and release notes
+The fourth blocker: `Collector Pressure Lab is independent of the
+OpenTelemetry project` appears in README and Terms without a matching manifest
+claim or observable test. This reopens F-1-4 as F-5-4.
 
-- Catalog copy is now verb-first and 77 characters: “Find when a local OpenTelemetry Collector queues, slows, or drops telemetry.”
-- The visual system remains the documented art-deco pressure-line treatment; no generic template or third-party runtime was introduced.
-- `cplab demo` remains a bundled, loopback-only temporary-directory flow. The website demo remains in the separate `demo:cplab:pressure-input` namespace and is cleared by **Start for real**.
-- Ready-to-publish package command: `cargo package`. Nothing was published from this work order.
+The fifth blocker: Privacy says the product adds no identifiers to hosting
+requests, but no manifest entry or test inspects identifiers in URLs, headers,
+cookies, or browser state. This also reopens F-1-4 as F-5-5.
 
-## Known gaps and next steps
+## Verification performed
 
-None. No review finding of any severity remains open.
+- Fresh live Chromium at 390 × 844 and 1440 × 900 for the cold first screen.
+- Live one-click demo entry, complete input/reset comparison, real-key
+  survival, four leave paths, same-origin request capture, and offline reload.
+- `cplab demo` from an empty temporary directory; exit 0, no current-directory
+  files, and three expected files in the reported temporary output.
+- Every one of the 15 `.factory/claims.json` commands independently in clean
+  clone `/tmp/cplab-review5-clean.LIxyAW`; all command exits were 0.
+- Full clean-clone `npm test`: 4 Rust unit, 4 CLI contract, 3 pressure fixture,
+  1 doctest, 6 Vitest, and 41 Playwright passes; 9 intentional mobile skips.
+- Live route/status/metadata/header/footer/link/focus checks; unknown route
+  returned the designed HTTP 404.
+- Live Axe checks at 390 px and the full local desktop/mobile accessibility
+  matrix; no serious or critical issue. Required URL verifier passed with no
+  console errors.
+- Live/local production JavaScript and CSS hashes match. Built JS is 2,697
+  bytes gzip; CSS is 4,367 bytes gzip.
+
+## Next steps
+
+Repair F-5-1 through F-5-5 exactly as specified in the review, add the missing
+reset, leave-path, metadata, and privacy assertions, deploy, then rerun the
+entire review rather than only the changed checks.

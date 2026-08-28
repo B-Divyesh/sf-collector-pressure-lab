@@ -4,7 +4,7 @@ use std::net::TcpListener;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 struct Fixture {
     endpoint: String,
@@ -21,12 +21,14 @@ impl Fixture {
         let child_stop = Arc::clone(&stop);
         let count = Arc::new(AtomicUsize::new(0));
         let handle = thread::spawn(move || {
+            let mut next_response = Instant::now();
             while !child_stop.load(Ordering::Relaxed) {
                 match listener.accept() {
                     Ok((mut stream, _)) => {
                         let mut request = [0_u8; 2048];
                         let _ = stream.read(&mut request);
-                        thread::sleep(delay);
+                        next_response = next_response.max(Instant::now()) + delay;
+                        thread::sleep(next_response.saturating_duration_since(Instant::now()));
                         let number = count.fetch_add(1, Ordering::Relaxed) + 1;
                         let failed = fail_every.is_some_and(|every| number.is_multiple_of(every));
                         let status = if failed { "503 Busy" } else { "200 OK" };

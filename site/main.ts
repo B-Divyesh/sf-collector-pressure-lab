@@ -2,6 +2,12 @@ import "./style.css";
 import { modelPressure, type ModelInput, type ModelResult } from "./model";
 
 const byId = <T extends HTMLElement>(id: string): T | null => document.getElementById(id) as T | null;
+const DEMO_KEY = "demo:cplab:pressure-input";
+const DEMO_INPUT: ModelInput = { arrivalRate: 900, exportCapacity: 420, queueCapacity: 1200, burstSeconds: 10 };
+
+function isDemoMode() {
+  return location.pathname.replace(/\/$/, "").startsWith("/demo") || new URLSearchParams(location.search).get("demo") === "1";
+}
 
 function updateNetworkState() {
   const banner = byId<HTMLElement>("network-state");
@@ -49,7 +55,7 @@ function paintResult(result: ModelResult) {
   summary.textContent = result.classification === "Stable"
     ? `Arrival stays below modeled export capacity at ${result.utilization}% utilization.`
     : result.classification === "Backpressure"
-      ? `The queue absorbs the burst and needs about ${result.recoverySeconds} seconds to drain after arrivals fall.`
+      ? `The queue holds the extra items. It needs about ${result.recoverySeconds} seconds to drain after arrivals fall.`
       : `${result.dropped.toLocaleString()} items exceed the queue. Reduce arrival pressure or fix exporter capacity before raising limits.`;
 }
 
@@ -59,12 +65,14 @@ function setupLab() {
   if (!form || !status) return;
   for (const control of form.querySelectorAll<HTMLInputElement>("input[type=range]")) {
     const readout = byId<HTMLOutputElement>(`${control.id}-value`);
-    const update = () => { if (readout) readout.value = Number(control.value).toLocaleString(); };
+    const update = () => {
+      if (readout) readout.value = Number(control.value).toLocaleString();
+      if (isDemoMode()) saveDemoInput();
+    };
     control.addEventListener("input", update);
     update();
   }
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
+  const runModel = () => {
     status.textContent = "Model running…";
     const input: ModelInput = {
       arrivalRate: value("arrival-rate"),
@@ -82,14 +90,96 @@ function setupLab() {
         status.textContent = error instanceof Error ? `Could not run model: ${error.message}` : "Could not run model. Check the inputs.";
       }
     }, delay);
+  };
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    runModel();
   });
+  return runModel;
+}
+
+function currentInput(): ModelInput {
+  return {
+    arrivalRate: value("arrival-rate"),
+    exportCapacity: value("export-capacity"),
+    queueCapacity: value("queue-capacity"),
+    burstSeconds: value("burst-seconds"),
+  };
+}
+
+function saveDemoInput() {
+  localStorage.setItem(DEMO_KEY, JSON.stringify(currentInput()));
+}
+
+function applyInput(input: ModelInput) {
+  for (const [id, value] of Object.entries({
+    "arrival-rate": input.arrivalRate,
+    "export-capacity": input.exportCapacity,
+    "queue-capacity": input.queueCapacity,
+    "burst-seconds": input.burstSeconds,
+  })) {
+    const control = byId<HTMLInputElement>(id);
+    if (!control) continue;
+    control.value = String(value);
+    control.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+}
+
+function setupDemo(runModel: (() => void) | undefined) {
+  if (!isDemoMode() || !runModel) return;
+  const banner = byId<HTMLElement>("demo-banner");
+  if (banner) banner.hidden = false;
+  document.body.classList.add("demo-mode");
+  document.title = "Demo — Collector Pressure Lab";
+  document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute("href", "https://collector-pressure-lab.sociobot.in/demo");
+  for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
+    document.querySelector<HTMLMetaElement>(selector)?.setAttribute("content", "Demo — Collector Pressure Lab");
+  }
+  let input = DEMO_INPUT;
+  try {
+    const saved = localStorage.getItem(DEMO_KEY);
+    if (saved) input = { ...DEMO_INPUT, ...JSON.parse(saved) } as ModelInput;
+  } catch {
+    localStorage.removeItem(DEMO_KEY);
+  }
+  applyInput(input);
+  saveDemoInput();
+  runModel();
+  byId<HTMLButtonElement>("reset-demo")?.addEventListener("click", () => {
+    localStorage.removeItem(DEMO_KEY);
+    applyInput(DEMO_INPUT);
+    saveDemoInput();
+    runModel();
+    byId<HTMLElement>("model-status")!.textContent = "Demo reset to the bundled sample.";
+  });
+  byId<HTMLAnchorElement>("exit-demo")?.addEventListener("click", () => localStorage.removeItem(DEMO_KEY));
+}
+
+function focusRouteTarget() {
+  const hashTarget = location.hash ? document.querySelector<HTMLElement>(location.hash) : null;
+  const target = hashTarget?.querySelector<HTMLElement>("h2, h1") ?? hashTarget;
+  const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+  const cameFromThisSite = document.referrer.startsWith(location.origin);
+  const shouldFocusHeading = location.pathname !== "/" || cameFromThisSite || navigation?.type === "back_forward";
+  const focusTarget = target ?? (shouldFocusHeading ? document.querySelector<HTMLElement>("h1") : null);
+  if (!focusTarget) return;
+  focusTarget.tabIndex = -1;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (hashTarget) window.scrollTo({ top: hashTarget.offsetTop, behavior: "instant" });
+    focusTarget.focus({ preventScroll: true });
+    byId<HTMLElement>("route-announcer")!.textContent = focusTarget.textContent?.trim() ?? document.title;
+  }));
 }
 
 updateNetworkState();
 window.addEventListener("online", updateNetworkState);
 window.addEventListener("offline", updateNetworkState);
 setupCopy();
-setupLab();
+const runModel = setupLab();
+setupDemo(runModel);
+window.addEventListener("load", focusRouteTarget);
+window.addEventListener("pageshow", (event) => { if (event.persisted) focusRouteTarget(); });
+window.addEventListener("hashchange", focusRouteTarget);
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => undefined));

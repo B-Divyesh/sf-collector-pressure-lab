@@ -52,7 +52,7 @@ like tracks rather than card borders. Touch targets are at least 44 px.
 
 ## Interaction grammar
 
-- The sole primary route is **Run the browser model**; CLI copy actions are
+- The sole primary route is **Try it with sample data**; CLI copy actions are
   secondary.
 - Inputs resemble signal levers: high-contrast tracks, large thumbs, and a
   numeric readout adjacent to the label.
@@ -83,6 +83,11 @@ transitions are removed; state changes remain visible instantly.
   subject with quiet negative space, no people, no logos, no letters, no words,
   no UI screenshot, no gradients, no watermark.” Generated imagery is treated
   as project-owned original artwork under the service output terms.
+- `site/public/social-card.webp`: deterministic 1200 × 630 center crop of the
+  original pressure-line artwork, created locally with ImageMagick on
+  2026-08-28. No new generated content was introduced.
+- `site/public/apple-touch-icon.png`: deterministic 180 px square center crop
+  of the same original artwork, created locally with ImageMagick on 2026-08-28.
 - Product marks, route diagram, gauges, and icons are hand-authored in HTML/CSS
   from primitive lines and shapes; no third-party icon set.
 

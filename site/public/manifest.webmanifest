@@ -1,7 +1,7 @@
 {
   "name": "Collector Pressure Lab",
   "short_name": "Pressure Lab",
-  "description": "Offline queue-pressure explainer and CLI documentation.",
+  "description": "Browser model and CLI for testing Collector pressure thresholds.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#101b20",

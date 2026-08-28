@@ -1,13 +1,15 @@
 {
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.{css,js,png,jpg,svg,webp,ico,woff2,json,txt,xml,wasm}"]
-  },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
-    "Referrer-Policy": "strict-origin-when-cross-origin"
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+    "Permissions-Policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
   },
   "routes": [
+    { "route": "/demo", "rewrite": "/demo/index.html" },
+    { "route": "/privacy", "rewrite": "/privacy/index.html" },
+    { "route": "/terms", "rewrite": "/terms/index.html" },
+    { "route": "/404", "rewrite": "/404/index.html", "statusCode": 404 },
     {
       "route": "/assets/*",
       "headers": {
@@ -26,5 +28,8 @@
         "Cache-Control": "no-cache"
       }
     }
-  ]
+  ],
+  "responseOverrides": {
+    "404": { "rewrite": "/404/index.html", "statusCode": 404 }
+  }
 }

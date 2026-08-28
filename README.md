@@ -1,16 +1,15 @@
 # Collector Pressure Lab
 
-Collector Pressure Lab is a local-first CLI for OpenTelemetry operators who
-want evidence before changing queue, batch, or exporter settings in production.
-It reads a Collector YAML file, replays a bounded JSON or NDJSON sample against
-a loopback OTLP/HTTP endpoint at stepped rates, samples optional Collector
-self-metrics, classifies the first pressure threshold, and prints tuning
-hypotheses. It never edits the configuration.
+Collector Pressure Lab tests when a local OpenTelemetry Collector queues, slows, or drops telemetry.
+It is for operators checking queue, batch, or exporter settings before a production change.
 
-Documentation and the offline model: https://collector-pressure-lab.sociobot.in
+The CLI reads Collector YAML and replays a bounded JSON or NDJSON sample.
+It increases request rates, reads optional metrics, and reports the first pressure threshold.
+It never edits the configuration.
 
-Synthetic results are directional, not production capacity guarantees. Run the
-lab against an isolated local Collector, never a production endpoint.
+Try the isolated sample at <https://collector-pressure-lab.sociobot.in/demo>.
+Synthetic results do not predict production capacity.
+Run each CLI test against an isolated Collector, never a production endpoint.
 
 ## Install
 
@@ -21,21 +20,35 @@ cargo install --path .
 cplab --help
 ```
 
-For a release artifact without installing it:
+Prepare the publishable source package without publishing it:
 
 ```sh
-cargo build --release
-./target/release/cplab --help
+cargo package
 ```
 
-Version 0.1.0 supports Linux, macOS, and Windows anywhere stable Rust runs.
-Factory release credentials are not included; `cargo package` prepares the
-publishable source package.
+Version 0.1.0 is distributed as source through Cargo.
+Factory registry credentials are not included.
 
-## Usage
+## Try the bundled sample
 
-Start an isolated Collector configured with an OTLP/HTTP receiver. Then replay
-an OTLP JSON payload or newline-delimited JSON bodies:
+Run one command without an account or Collector setup:
+
+```sh
+cplab demo
+```
+
+The command copies the bundled config and telemetry sample into a temporary directory.
+It starts a temporary loopback receiver, runs the pressure test, and writes `report.json` beside the copied inputs.
+The final output prints that directory.
+
+The web demo uses separate `demo:` browser storage.
+Use **Reset demo** to restore its sample or **Start for real** to remove demo data.
+See [.factory/demo.md](.factory/demo.md) for the full sandbox contract.
+
+## Test a Collector
+
+Start an isolated Collector with an OTLP/HTTP receiver.
+Then replay an OTLP JSON payload or newline-delimited JSON bodies:
 
 ```sh
 cplab run \
@@ -46,65 +59,75 @@ cplab run \
   --duration 2s
 ```
 
-Each non-empty NDJSON line is sent as one request. A regular JSON file is sent
-as one request body. The sample is loaded once and capped at 8 MiB and 10,000
-records. Each rate step is time- and request-bounded. By default, the CLI also
-tries `http://127.0.0.1:8888/metrics`; use `--metrics-endpoint off` when
-Collector self-metrics are unavailable.
+Each non-empty NDJSON line becomes one request.
+A regular JSON file becomes one request body.
+The CLI loads at most 8 MiB or 10,000 records.
+Each rate step has time, request, and concurrency limits.
 
-Machine-readable output and CI mode:
+The CLI checks `http://127.0.0.1:8888/metrics` by default.
+Pass `--metrics-endpoint off` when Collector self-metrics are unavailable.
+
+Use machine-readable output in scripts:
 
 ```sh
 cplab run --config collector.yaml --sample sample.json \
   --rates 100,200 --duration 1s --json --ci
 ```
 
-`--ci` disables status animation and returns a non-zero exit code when the run
-cannot be performed. A completed run exits 0 even when it discovers pressure,
-including when every received HTTP response is non-2xx; the JSON
-`classification` field is intended for policy decisions. Exit codes:
+`--ci` removes status animation and returns a non-zero code when the test cannot run.
+A completed run exits 0, even when every HTTP response is non-2xx.
+Use the JSON classification field for policy decisions.
 
-- `0`: experiment completed
-- `2`: arguments, input, safety check, or configuration error
-- `3`: no HTTP response could be measured (for example, every connection or
-  request timed out)
+Exit codes:
 
-Use `--header 'name:value'` for a local test receiver that requires metadata.
-Remote hosts are rejected. `--allow-remote` exists for controlled lab networks
-and prints an explicit warning; samples still remain on the operator's machine
-except for requests sent to the chosen endpoint.
+- `0`: test completed
+- `2`: argument, input, safety, or configuration error
+- `3`: no HTTP response could be measured
 
-Inspect config-derived settings without sending traffic:
+Use `--header 'name:value'` when a local receiver requires metadata.
+Remote hosts are rejected by default.
+Use `--allow-remote` only on a controlled test network.
+The CLI warns you and sends samples only to the endpoint you choose.
+
+## Inspect Collector settings
+
+Read config settings without sending traffic:
 
 ```sh
 cplab inspect --config ./examples/collector.yaml
 cplab inspect --config ./examples/collector.yaml --json
 ```
 
-The parser intentionally extracts only pressure-relevant Collector settings:
-`sending_queue.enabled`, `sending_queue.queue_size`, `sending_queue.num_consumers`,
-`batch.send_batch_size`, `batch.send_batch_max_size`, and `batch.timeout`.
+The parser reads these Collector queue and batch settings:
+
+- `sending_queue.enabled`
+- `sending_queue.queue_size`
+- `sending_queue.num_consumers`
+- `batch.send_batch_size`
+- `batch.send_batch_max_size`
+- `batch.timeout`
+
 Unknown or templated values are reported, not guessed.
 
-## How classification works
+## Understand classification
 
-At each offered rate, the lab records attempts, HTTP responses, successful
-responses, transport errors/non-2xx drops, response latency, achieved request throughput, and deltas
-from common `otelcol_*` queue/refusal/failure counters when metrics are exposed.
-The first step with explicit failures/refusals is **drops**. A step with rising
-latency, exporter queue growth, or materially lower achieved throughput is
-**backpressure**. Otherwise it is **stable**. The reported threshold is the
-lowest pressured step and is refined from observed successful throughput.
+At each rate, the CLI records attempts, responses, drops, latency, and throughput.
+When available, it reads Collector queue, refusal, and failure counters.
 
-This is an HTTP boundary experiment. It cannot see memory spikes, downstream
-backend throttling outside the run window, or queue state when Collector
-self-metrics are disabled. Tuning output is a hypothesis to validate, not an
-automatic configuration change.
+The first step with failures or refusals is **drops**.
+Rising latency, queue growth, or lower throughput is **backpressure**.
+Otherwise the result is **stable**.
+The threshold uses the lowest pressured step and measured successful throughput.
 
-## Site and browser model
+The CLI tests at the Collector's OTLP/HTTP input.
+It cannot see memory spikes or downstream throttling outside the test window.
+It cannot read queue state when self-metrics are off.
+Suggested settings are next tests, not automatic configuration changes.
 
-The landing page documents the CLI and includes an entirely offline queue
-model. The model explains likely behavior but does not contact a Collector.
+## Run the site
+
+The site documents the CLI and includes a browser model.
+The browser model works offline after the first visit and does not contact a Collector.
 
 ```sh
 npm ci
@@ -112,29 +135,29 @@ npm run dev
 npm run build:site    # output: dist/site
 ```
 
-## Test and verify
+## Test and package
 
 ```sh
-cargo test
 npm test
-npm run build
-cargo package --allow-dirty
+npm run test:claims
+cargo clippy --all-targets --all-features -- -D warnings
+cargo package
 ```
 
-`npm test` runs Rust tests plus the site unit and browser tests. The documented
-examples are covered by CLI integration tests, including a controlled slow
-receiver fixture.
+`npm test` runs Rust, browser-model, build, and browser tests.
+The CLI integration suite includes a controlled slow receiver.
+Every visitor-facing claim is listed in [.factory/claims.json](.factory/claims.json).
 
 ## Privacy and scope
 
-There is no telemetry, analytics, account, upload, local storage, or runtime
-third-party request. CLI inputs stay local unless their bounded request bodies
-are sent to the endpoint you provide. See the site privacy and terms pages.
+The site has no analytics, account, upload, or third-party runtime request.
+Outside demo mode, the browser model stores no inputs.
+CLI inputs stay local except for bounded bodies sent to your chosen endpoint.
+Read the [privacy](https://collector-pressure-lab.sociobot.in/privacy/) and [terms](https://collector-pressure-lab.sociobot.in/terms/) pages.
 
-Collector Pressure Lab is independent of the OpenTelemetry project. It reads
-configuration keys and public self-metric names but bundles no OpenTelemetry
-source or assets.
+Collector Pressure Lab is independent of the OpenTelemetry project.
+It bundles no OpenTelemetry source or assets.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+This project uses the [MIT License](LICENSE).

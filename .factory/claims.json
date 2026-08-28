@@ -1,0 +1,86 @@
+[
+  {
+    "id": "demo-isolation",
+    "claim": "The web demo is populated in one click, uses only demo-prefixed storage, resets, and the CLI demo writes only to a reported temporary directory.",
+    "where": "landing first screen, demo banner, README",
+    "test": "npm run test:claims -- --grep @claim:demo-isolation",
+    "sandbox": "fresh browser context and fresh temporary working directory; inspect storage keys, reset/exit behavior, CLI output path, and current-directory contents"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "The browser model works offline after the first visit.",
+    "where": "landing facts, offline banner, README",
+    "test": "npm run test:claims -- --grep @claim:offline-reload",
+    "sandbox": "fresh Chromium context at /demo; install service worker, switch the context offline, reload, and assert a populated result"
+  },
+  {
+    "id": "browser-no-network-or-storage",
+    "claim": "The ordinary browser model contacts no Collector and stores no inputs.",
+    "where": "browser-model section, privacy page, README",
+    "test": "npm run test:claims -- --grep @claim:browser-no-network-or-storage",
+    "sandbox": "fresh browser context at /; intercept the complete model flow and inspect localStorage, sessionStorage, and IndexedDB"
+  },
+  {
+    "id": "loopback-guard",
+    "claim": "CLI endpoints are loopback-only by default, while --allow-remote prints a warning.",
+    "where": "landing facts, CLI features, README",
+    "test": "npm run test:claims -- --grep @claim:loopback-guard",
+    "sandbox": "shipped sample in a temporary process; reject example.com, explicitly allow the TEST-NET address, assert warning, and hash the sample"
+  },
+  {
+    "id": "bounded-replay",
+    "claim": "The CLI maps JSON or NDJSON to bounded requests with documented header, duration, rate, request, concurrency, size, and record limits.",
+    "where": "how-it-works, README usage",
+    "test": "npm run test:claims -- --grep @claim:bounded-replay",
+    "sandbox": "temporary two-line NDJSON and loopback capture server; assert exact bodies and header, then reject each documented out-of-range value"
+  },
+  {
+    "id": "config-inspection",
+    "claim": "The CLI reads the documented Collector queue and batch keys and reports templated values as unknown.",
+    "where": "how-it-works, README inspect section",
+    "test": "npm run test:claims -- --grep @claim:config-inspection",
+    "sandbox": "shipped config plus a temporary templated config; assert every documented field and the warning"
+  },
+  {
+    "id": "classification",
+    "claim": "The CLI reports stable, backpressure, or drops and emits scriptable JSON, including complete non-2xx loss.",
+    "where": "landing, CLI output, README classification",
+    "test": "npm run test:claims -- --grep @claim:classification",
+    "sandbox": "temporary fast, slow, and all-503 loopback receivers; assert classifications, counts, JSON, and exit behavior"
+  },
+  {
+    "id": "no-config-write",
+    "claim": "The CLI never edits the supplied Collector config or telemetry sample.",
+    "where": "CLI features, privacy page, README",
+    "test": "npm run test:claims -- --grep @claim:no-config-write",
+    "sandbox": "hash both shipped inputs before and after inspect and demo paths"
+  },
+  {
+    "id": "package-and-tests",
+    "claim": "The project builds one documented Rust binary and produces a publishable Cargo source package.",
+    "where": "landing CLI section, README install and test sections",
+    "test": "npm run test:claims -- --grep @claim:package-and-tests",
+    "sandbox": "clean build output; run --help, inspect the single binary declaration, and execute cargo package verification"
+  },
+  {
+    "id": "no-third-party-runtime",
+    "claim": "The website has no analytics, tracking, remote font, or third-party runtime request.",
+    "where": "privacy page, README",
+    "test": "npm run test:claims -- --grep @claim:no-third-party-runtime",
+    "sandbox": "fresh demo flow with all browser requests recorded, plus source scan for common tracking and remote-runtime hosts"
+  },
+  {
+    "id": "legal-and-site-links",
+    "claim": "Home, demo, privacy, terms, metadata, MIT license, and the styled 404 are published.",
+    "where": "site navigation, README",
+    "test": "npm run test:claims -- --grep @claim:legal-and-site-links",
+    "sandbox": "fresh browser and HTTP client; assert route statuses, titles, canonical/social metadata, heading focus, 404 copy, and LICENSE text"
+  },
+  {
+    "id": "threshold-accuracy",
+    "claim": "The controlled 50 rps slow-exporter fixture reports its pressure threshold within 20 percent.",
+    "where": "brief success measure, test documentation",
+    "test": "npm run test:claims -- --grep @claim:threshold-accuracy",
+    "sandbox": "run the isolated 20 ms serial loopback receiver regression and require its numeric 40–60 rps assertion to pass"
+  }
+]

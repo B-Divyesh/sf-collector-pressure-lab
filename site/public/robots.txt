@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://collector-pressure-lab.sociobot.in/sitemap.xml

@@ -1,0 +1,1 @@
+Test when a local OpenTelemetry Collector queues, slows, or drops telemetry under bounded request rates.

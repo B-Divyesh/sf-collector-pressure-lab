@@ -171,7 +171,7 @@ fn all_503_responses_exit_zero_with_a_complete_json_drop_report() {
         .output()
         .unwrap();
     assert!(human.status.success());
-    assert!(String::from_utf8_lossy(&human.stdout).contains("PRESSURE LINE  DROPS"));
+    assert!(String::from_utf8_lossy(&human.stdout).contains("COLLECTOR RESULT  DROPS"));
 }
 
 #[test]

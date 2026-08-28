@@ -4,9 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#101b20" />
-    <meta name="description" content="Replay bounded telemetry bursts against a local OpenTelemetry Collector and learn where it queues, slows, or drops." />
-    <title>Collector Pressure Lab — test the pressure line</title>
+    <meta name="description" content="Test a bounded telemetry sample against a local Collector and find where requests queue, slow, or drop." />
+    <title>Collector Pressure Lab — test Collector backpressure</title>
+    <link rel="canonical" href="https://collector-pressure-lab.sociobot.in/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Collector Pressure Lab — test Collector backpressure" />
+    <meta property="og:description" content="Test a bounded telemetry sample against a local Collector and find where requests queue, slow, or drop." />
+    <meta property="og:url" content="https://collector-pressure-lab.sociobot.in/" />
+    <meta property="og:image" content="https://collector-pressure-lab.sociobot.in/social-card.webp" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Collector Pressure Lab — test Collector backpressure" />
+    <meta name="twitter:description" content="Test a bounded telemetry sample against a local Collector and find where requests queue, slow, or drop." />
+    <meta name="twitter:image" content="https://collector-pressure-lab.sociobot.in/social-card.webp" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <script type="module" src="/main.ts"></script>
   </head>
@@ -15,68 +28,80 @@
     <div class="network-banner" id="network-state" role="status" hidden>
       Offline mode: the browser model still works. CLI install links need a connection.
     </div>
+    <div class="demo-banner" id="demo-banner" hidden>
+      <strong>Demo — sample data, nothing is saved</strong>
+      <span>Changes use separate demo storage.</span>
+      <button type="button" id="reset-demo">Reset demo</button>
+      <a href="/" id="exit-demo">Start for real</a>
+    </div>
     <header class="site-header">
       <a class="brand" href="/" aria-label="Collector Pressure Lab home">
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
         <span>Collector <b>Pressure Lab</b></span>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="#method">Method</a>
-        <a href="#cli">CLI</a>
-        <a class="nav-action" href="#lab">Open lab <span aria-hidden="true">↓</span></a>
+        <a href="/demo">Demo</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/terms/">Terms</a>
+        <a class="nav-action" href="/demo">Try sample pressure test <span aria-hidden="true">→</span></a>
       </nav>
     </header>
 
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow"><span>Route 01</span> Local collector experiment</p>
-          <h1 id="hero-title">Find the platform edge <em>before the incident.</em></h1>
-          <p class="hero-lede">Replay a bounded telemetry burst. See the first queue, slowdown, or drop. Leave with a tuning hypothesis—not a guess.</p>
+          <p class="eyebrow"><span>Route 01</span> Collector pressure test</p>
+          <h1 id="hero-title" tabindex="-1">Find your Collector's <em>pressure threshold</em></h1>
+          <p class="hero-lede">For OpenTelemetry operators testing when a local Collector queues, slows, or drops telemetry.</p>
           <div class="hero-actions">
-            <a class="button primary" href="#lab">Run the browser model</a>
+            <a class="button primary" href="/demo">Try it with sample data</a>
+            <span class="action-hint">Loads a safe sample and shows the result.</span>
             <a class="button secondary" href="#cli">Install the CLI</a>
           </div>
-          <p class="safety-note"><span aria-hidden="true">◆</span> Loopback-only by default · samples stay local · no config writes</p>
+          <ul class="hero-facts" aria-label="Product facts">
+            <li>Free to use.</li>
+            <li>Works offline after the first visit.</li>
+            <li>Runs against loopback by default.</li>
+          </ul>
         </div>
         <figure class="poster-frame">
-          <div class="poster-label" aria-hidden="true"><span>Pressure line</span><b>01</b></div>
+          <div class="poster-label" aria-hidden="true"><span>Queue signal</span><b>01</b></div>
           <img src="/pressure-line.webp" width="1440" height="960" alt="" fetchpriority="high" />
-          <figcaption>Capacity becomes visible when the platform starts to fill.</figcaption>
+          <figcaption>See when incoming telemetry exceeds export capacity.</figcaption>
         </figure>
       </section>
 
       <aside class="notice" aria-label="Capacity disclaimer">
-        <strong>Lab evidence, not a capacity guarantee.</strong>
+        <strong>Test evidence, not a capacity guarantee.</strong>
         <span>Use an isolated Collector and repeat with production-shaped samples before changing limits.</span>
       </aside>
 
       <section class="method section" id="method" aria-labelledby="method-title">
         <div class="section-heading">
-          <p class="eyebrow">The route</p>
-          <h2 id="method-title">One sample. Stepped arrivals. An explainable verdict.</h2>
+          <p class="eyebrow">How the pressure test works</p>
+          <h2 id="method-title">Test one sample at increasing rates</h2>
         </div>
         <ol class="route-list">
           <li>
             <span class="station" aria-hidden="true">01</span>
-            <div><h3>Read the controls</h3><p>Extract queue consumers, capacity, and batch settings from your Collector YAML. Templated values stay unknown.</p></div>
+            <div><h3>Read Collector settings</h3><p>Read queue size, consumer count, and batch settings. Templated values remain unknown.</p></div>
           </li>
           <li>
             <span class="station" aria-hidden="true">02</span>
-            <div><h3>Replay bounded bursts</h3><p>Send your JSON bodies at stepped rates with hard caps on duration, requests, concurrency, and sample size.</p></div>
+            <div><h3>Replay bounded requests</h3><p>Replay JSON requests at increasing rates within fixed safety limits.</p></div>
           </li>
           <li>
             <span class="station" aria-hidden="true">03</span>
-            <div><h3>Mark the pressure line</h3><p>Combine response latency, throughput, failures, and optional Collector self-metrics into a stable, backpressure, or drops result.</p></div>
+            <div><h3>Classify the first failure</h3><p>Classify each run as stable, backpressure, or drops.</p></div>
           </li>
         </ol>
       </section>
 
       <section class="lab section" id="lab" aria-labelledby="lab-title">
         <div class="section-heading">
-          <p class="eyebrow">Offline explainer</p>
+          <p class="eyebrow">Browser queue model</p>
           <h2 id="lab-title">Model a burst before you run the CLI.</h2>
-          <p>This deterministic queue model teaches the mechanics in your browser. It sends nothing and does not benchmark your Collector.</p>
+          <p>The browser model explains queue behavior without contacting your Collector. It does not predict production capacity.</p>
         </div>
         <div class="lab-grid">
           <form class="controls" id="pressure-form">
@@ -96,17 +121,17 @@
               <label for="burst-seconds">Burst duration <span><output id="burst-seconds-value" for="burst-seconds">8</output> sec</span></label>
               <input id="burst-seconds" type="range" min="1" max="30" step="1" value="8" />
             </div>
-            <button class="button primary run-button" type="submit">Run the model <span aria-hidden="true">→</span></button>
-            <p class="status-text" id="model-status" aria-live="polite">Ready. Adjust a lever or run the default burst.</p>
+            <button class="button primary run-button" type="submit">Show pressure result <span aria-hidden="true">→</span></button>
+            <p class="status-text" id="model-status" aria-live="polite">Ready. Adjust a setting or show the sample result.</p>
           </form>
 
           <div class="model-output" id="model-output" data-state="empty" aria-labelledby="result-title">
             <div class="result-head">
               <div><p class="eyebrow">Modeled result</p><h3 id="result-title"><span class="signal" aria-hidden="true"></span><span id="classification">Not run</span></h3></div>
-              <span class="ticket">Local model</span>
+              <span class="ticket">Browser model</span>
             </div>
             <div class="queue-gauge" role="img" aria-label="Modeled queue utilization">
-              <span class="gauge-label">Queue platform</span>
+              <span class="gauge-label">Queue use</span>
               <div class="gauge-track"><i id="queue-fill"></i></div>
               <span class="gauge-end">limit</span>
             </div>
@@ -116,54 +141,57 @@
               <div><dt>Dropped</dt><dd id="drop-result">—</dd></div>
               <div><dt>Drain time</dt><dd id="recovery-result">—</dd></div>
             </dl>
-            <p class="model-summary" id="model-summary">Run the model to see whether this synthetic burst clears the platform, waits in queue, or crosses the drop gate.</p>
+            <p class="model-summary" id="model-summary">Show the result to see whether the queue drains, backs up, or drops items.</p>
           </div>
         </div>
       </section>
 
       <section class="cli section" id="cli" aria-labelledby="cli-title">
         <div class="cli-copy">
-          <p class="eyebrow">The real experiment</p>
-          <h2 id="cli-title">Bring the pressure line to your terminal.</h2>
-          <p>The Rust binary sends your bounded sample to your local OTLP/HTTP receiver and can read Collector self-metrics. Human output explains the result; <code>--json</code> makes it scriptable.</p>
+          <p class="eyebrow">Collector CLI</p>
+          <h2 id="cli-title">Test your local Collector from the terminal</h2>
+          <p>The Rust binary sends a bounded sample to your local OTLP/HTTP receiver. It can also read Collector self-metrics.</p>
+          <p>Human output describes the result. Use <code>--json</code> in scripts.</p>
           <ul class="feature-list">
             <li><span aria-hidden="true">✓</span> One native binary, no runtime or account</li>
             <li><span aria-hidden="true">✓</span> Loopback endpoint guard by default</li>
             <li><span aria-hidden="true">✓</span> Never edits the Collector config</li>
           </ul>
         </div>
-        <div class="terminal" aria-label="CLI installation and usage example">
-          <div class="terminal-top"><span>CONTROL ROOM / 01</span><i></i><i></i><i></i></div>
+        <div class="terminal" aria-label="Recording of the cplab demo command">
+          <div class="terminal-top"><span>RECORDED CLI DEMO / SAMPLE 01</span><i></i><i></i><i></i></div>
           <div class="command-row"><code id="install-command" tabindex="0" aria-label="Scrollable install command">cargo install --git https://github.com/B-Divyesh/sf-collector-pressure-lab</code><button id="copy-command" type="button">Copy command</button></div>
-          <pre><code><span class="prompt">$</span> cplab run \
-  --config collector.yaml \
-  --sample traces.ndjson \
-  --rates 25,50,100,200
+          <pre><code><span class="prompt">$</span> cplab demo
 
-PRESSURE LINE  BACKPRESSURE
+DEMO — bundled sample, temporary loopback receiver
+
+COLLECTOR RESULT  BACKPRESSURE
 offered  achieved  p95       state
-100/s      81.4/s  184.2ms   backpressure
+100/s      49.4/s  484.8ms   backpressure
 
-First pressure threshold: ~81.4 req/s</code></pre>
+First pressure threshold: ~49.4 req/s
+Demo files: /tmp/cplab-demo-…</code></pre>
           <p class="sr-only" id="copy-feedback" aria-live="polite"></p>
         </div>
       </section>
 
       <section class="boundaries section" aria-labelledby="boundaries-title">
-        <p class="eyebrow">Know the boundary</p>
-        <h2 id="boundaries-title">Small on purpose.</h2>
+        <p class="eyebrow">What the CLI can and cannot measure</p>
+        <h2 id="boundaries-title">Know what the result means</h2>
         <div class="boundary-grid">
-          <div><h3>It measures</h3><p>HTTP response latency, achieved throughput, non-success responses, and available queue/failure self-metrics across your chosen steps.</p></div>
-          <div><h3>It suggests</h3><p>Concrete next experiments around queue buffering, consumers, batches, downstream latency, and a finer threshold search.</p></div>
-          <div><h3>It does not</h3><p>Store telemetry, generate production-scale traffic, guarantee capacity, or rewrite a configuration on your behalf.</p></div>
+          <div><h3>Measurements</h3><p>See response latency, throughput, non-success responses, and available queue or failure metrics for each rate.</p></div>
+          <div><h3>Suggested next tests</h3><p>Test queue size, consumers, batches, downstream latency, or a narrower range of request rates.</p></div>
+          <div><h3>Limits</h3><p>The CLI does not store telemetry, generate production-scale traffic, guarantee capacity, or rewrite your configuration.</p></div>
         </div>
       </section>
     </main>
 
     <footer>
       <div class="brand footer-brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Collector Pressure Lab</span></div>
-      <p>Free, local-first, and independent of the OpenTelemetry project.</p>
-      <nav aria-label="Legal navigation"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-collector-pressure-lab">Source</a></nav>
+      <p>Test bounded telemetry against a Collector you control.</p>
+      <nav aria-label="Footer navigation"><a href="/demo">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-collector-pressure-lab" rel="external">Source on GitHub <span class="external-note">(opens external site)</span></a></nav>
+      <p class="build-note">Built by Param Factory · v0.1.0 · build 868ec12-r2</p>
     </footer>
+    <div class="route-announcer sr-only" id="route-announcer" aria-live="polite"></div>
   </body>
 </html>

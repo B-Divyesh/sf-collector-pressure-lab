@@ -21,7 +21,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npx vite preview --host 127.0.0.1 --port 4173",
+    command: "node site/preview.mjs",
     url: "http://127.0.0.1:4173",
     reuseExistingServer: false,
   },

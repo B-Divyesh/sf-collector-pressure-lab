@@ -108,7 +108,7 @@ pub struct Report {
     pub warnings: Vec<String>,
 }
 
-/// Inspect only the pressure-relevant subset of a Collector YAML file.
+/// Inspect the Collector config values used by a pressure test.
 pub fn inspect_config(path: impl AsRef<Path>) -> Result<ConfigSummary, String> {
     let text = fs::read_to_string(path.as_ref())
         .map_err(|e| format!("could not read config {}: {e}", path.as_ref().display()))?;
@@ -175,12 +175,12 @@ pub fn parse_config(text: &str) -> ConfigSummary {
     if result.sending_queue_enabled.is_none() && result.queue_size.is_none() {
         result
             .warnings
-            .push("no explicit exporter sending_queue settings found".into());
+            .push("no explicit exporter sending_queue config values found".into());
     }
     if result.batch_timeout.is_none() && result.send_batch_size.is_none() {
         result
             .warnings
-            .push("no explicit batch processor settings found".into());
+            .push("no explicit batch processor config values found".into());
     }
     result
 }

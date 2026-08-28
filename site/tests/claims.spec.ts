@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { spawn, spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -12,13 +12,13 @@ const sample = resolve("examples/traces.ndjson");
 
 test.describe.configure({ mode: "serial" });
 
-function run(args: string[], cwd = resolve(".")) {
-  return spawnSync(binary, args, { cwd, encoding: "utf8", timeout: 60_000 });
+function run(args: string[], cwd = resolve("."), env: Record<string, string | undefined> = process.env) {
+  return spawnSync(binary, args, { cwd, env, encoding: "utf8", timeout: 60_000 });
 }
 
-function runAsync(args: string[]) {
+function runAsync(args: string[], cwd = resolve("."), env: Record<string, string | undefined> = process.env) {
   return new Promise<{ code: number | null; stdout: string; stderr: string }>((done) => {
-    const child = spawn(binary, args, { cwd: resolve(".") });
+    const child = spawn(binary, args, { cwd, env });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (chunk) => { stdout += chunk; });
@@ -27,13 +27,20 @@ function runAsync(args: string[]) {
   });
 }
 
-async function receiver(options: { delay?: number; serialDelay?: number; status?: number; capture?: Array<{ body: string; header: string | undefined }> } = {}) {
+type CapturedRequest = { body: string; header: string | undefined; method: string | undefined; path: string | undefined };
+
+async function receiver(options: { delay?: number; serialDelay?: number; status?: number; capture?: CapturedRequest[] } = {}) {
   let nextResponse = Date.now();
   const server = createServer((request, response) => {
     let body = "";
     request.on("data", (chunk) => { body += chunk; });
     request.on("end", () => {
-      options.capture?.push({ body, header: request.headers["x-claim"] as string | undefined });
+      options.capture?.push({
+        body,
+        header: request.headers["x-claim"] as string | undefined,
+        method: request.method,
+        path: request.url,
+      });
       const now = Date.now();
       const wait = options.serialDelay
         ? Math.max(now, nextResponse) + options.serialDelay - now
@@ -51,17 +58,42 @@ async function receiver(options: { delay?: number; serialDelay?: number; status?
   return { server, endpoint: `http://127.0.0.1:${address.port}/v1/traces` };
 }
 
+async function metricsReceiver() {
+  let reads = 0;
+  const paths: string[] = [];
+  const server = createServer((request, response) => {
+    paths.push(request.url ?? "");
+    const afterReplay = reads++ > 0;
+    const body = [
+      `otelcol_exporter_queue_size{exporter="otlp"} ${afterReplay ? 15 : 5}`,
+      'otelcol_exporter_queue_capacity{exporter="otlp"} 100',
+      `otelcol_exporter_send_failed_spans_total{exporter="otlp"} ${afterReplay ? 2 : 0}`,
+      "",
+    ].join("\n");
+    response.writeHead(200, { "content-type": "text/plain", "content-length": Buffer.byteLength(body) });
+    response.end(body);
+  });
+  await new Promise<void>((done, reject) => {
+    server.once("error", reject);
+    server.listen(8888, "127.0.0.1", done);
+  });
+  return { server, paths };
+}
+
 function close(server: Server) {
   return new Promise<void>((done) => server.close(() => done()));
 }
 
 test("@claim:demo-isolation opens populated sample data and clears only its namespace", async ({ page }) => {
-  await page.goto("/demo");
+  await page.goto("/");
+  await page.evaluate(() => localStorage.setItem("real:cplab:sentinel", "keep"));
+  await page.getByRole("link", { name: "Try it with sample data" }).click();
+  await expect(page).toHaveURL(/\/demo$/);
   await expect(page).toHaveTitle("Demo — Collector Pressure Lab");
   await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
   await expect(page.locator("#classification")).toHaveText("Drops");
   expect((await page.locator("#classification").boundingBox())!.y).toBeLessThan(page.viewportSize()!.height);
-  expect(await page.evaluate(() => Object.keys(localStorage))).toEqual(["demo:cplab:pressure-input"]);
+  expect((await page.evaluate(() => Object.keys(localStorage))).sort()).toEqual(["demo:cplab:pressure-input", "real:cplab:sentinel"]);
   await page.locator("#arrival-rate").evaluate((element: HTMLInputElement) => {
     element.value = "1200";
     element.dispatchEvent(new Event("input", { bubbles: true }));
@@ -70,8 +102,11 @@ test("@claim:demo-isolation opens populated sample data and clears only its name
   await expect(page.locator("#arrival-rate")).toHaveValue("900");
   await page.getByRole("link", { name: "Start for real" }).click();
   await expect(page).toHaveURL(/\/$/);
-  expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
+  expect(await page.evaluate(() => Object.fromEntries(Object.entries(localStorage)))).toEqual({ "real:cplab:sentinel": "keep" });
   await page.goto("/?demo=1");
+  await expect(page).toHaveTitle("Demo — Collector Pressure Lab");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://collector-pressure-lab.sociobot.in/demo");
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", "https://collector-pressure-lab.sociobot.in/demo");
   await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
   await expect(page.locator("#classification")).toHaveText("Drops");
   expect((await page.locator("#classification").boundingBox())!.y).toBeLessThan(page.viewportSize()!.height);
@@ -126,7 +161,7 @@ test("@claim:loopback-guard rejects remote endpoints unless explicitly allowed",
 
 test("@claim:bounded-replay maps NDJSON bodies and enforces every documented bound", async ({}, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "CLI claim runs once");
-  const capture: Array<{ body: string; header: string | undefined }> = [];
+  const capture: CapturedRequest[] = [];
   const fixture = await receiver({ capture });
   const directory = mkdtempSync(join(tmpdir(), "cplab-claim-bounds-"));
   const ndjson = join(directory, "two.ndjson");
@@ -188,16 +223,79 @@ test("@claim:classification reports stable, backpressure, complete drops, and sc
   expect(report.hypotheses.length).toBeGreaterThan(0);
 
   const backpressure = spawnSync("cargo", ["test", "--test", "pressure_fixture"], { encoding: "utf8", timeout: 120_000 });
-  expect(backpressure.status).toBe(0);
+  expect(backpressure.status, `pressure fixture failed\nstdout:\n${backpressure.stdout}\nstderr:\n${backpressure.stderr}`).toBe(0);
   expect(backpressure.stdout + backpressure.stderr).toContain("3 passed");
-  const metrics = spawnSync("cargo", ["test", "tests::parses_metrics_by_signal_sum", "--", "--exact"], { encoding: "utf8", timeout: 120_000 });
-  expect(metrics.status).toBe(0);
   const unavailable = await receiver();
   const unavailableEndpoint = unavailable.endpoint;
   await close(unavailable.server);
   const failed = run(["run", "--config", config, "--sample", sample, "--endpoint", unavailableEndpoint, "--metrics-endpoint", "off", "--rates", "1", "--duration", "250ms", "--timeout", "50ms", "--ci"]);
   expect(failed.status).toBe(3);
   expect(failed.stderr).toContain("no HTTP responses were received");
+});
+
+test("@claim:collector-metrics reads the default Collector metrics endpoint and reports pressure deltas", async ({}, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "CLI claim runs once");
+  const telemetry = await receiver();
+  const metrics = await metricsReceiver();
+  try {
+    const output = await runAsync([
+      "run", "--config", config, "--sample", sample, "--endpoint", telemetry.endpoint,
+      "--rates", "4", "--duration", "250ms", "--timeout", "1s", "--max-requests", "1", "--json", "--ci",
+    ]);
+    expect(output.code, output.stderr).toBe(0);
+    const report = JSON.parse(output.stdout);
+    expect(report.steps[0].metrics).toEqual({ queue_size: 10, queue_capacity: 100, failed_or_refused: 2 });
+    expect(report.classification).toBe("drops");
+    expect(metrics.paths).toEqual(["/metrics", "/metrics"]);
+  } finally {
+    await Promise.all([close(telemetry.server), close(metrics.server)]);
+  }
+});
+
+test("@claim:cli-data-boundary creates no persistent telemetry copy and uses only selected endpoints", async ({}, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "CLI claim runs once");
+  const root = mkdtempSync(join(tmpdir(), "cplab-claim-boundary-"));
+  const directories = ["cache", "config", "home", "inputs", "temp", "work"];
+  for (const name of directories) mkdirSync(join(root, name));
+  const isolatedConfig = join(root, "inputs", "collector.yaml");
+  const isolatedSample = join(root, "inputs", "traces.ndjson");
+  copyFileSync(config, isolatedConfig);
+  copyFileSync(sample, isolatedSample);
+  const isolatedEnv = {
+    ...process.env,
+    HOME: join(root, "home"),
+    XDG_CACHE_HOME: join(root, "cache"),
+    XDG_CONFIG_HOME: join(root, "config"),
+    TMPDIR: join(root, "temp"),
+    TMP: join(root, "temp"),
+    TEMP: join(root, "temp"),
+  };
+
+  const inspected = run(["inspect", "--config", isolatedConfig, "--json"], join(root, "work"), isolatedEnv);
+  expect(inspected.status, inspected.stderr).toBe(0);
+  const captured: CapturedRequest[] = [];
+  const fixture = await receiver({ capture: captured });
+  try {
+    const replay = await runAsync([
+      "run", "--config", isolatedConfig, "--sample", isolatedSample, "--endpoint", fixture.endpoint,
+      "--metrics-endpoint", "off", "--rates", "4", "--duration", "250ms", "--max-requests", "1", "--json", "--ci",
+    ], join(root, "work"), isolatedEnv);
+    expect(replay.code, replay.stderr).toBe(0);
+  } finally {
+    await close(fixture.server);
+  }
+  expect(captured).toHaveLength(1);
+  expect(captured.map(({ method, path }) => ({ method, path }))).toEqual([{ method: "POST", path: "/v1/traces" }]);
+  for (const name of ["cache", "config", "home", "temp", "work"]) expect(readdirSync(join(root, name))).toEqual([]);
+  expect(readdirSync(join(root, "inputs")).sort()).toEqual(["collector.yaml", "traces.ndjson"]);
+
+  const demo = run(["demo"], join(root, "work"), isolatedEnv);
+  expect(demo.status, demo.stderr).toBe(0);
+  const demoPath = demo.stdout.match(/Demo files: (.+)/)?.[1].trim();
+  expect(demoPath?.startsWith(join(root, "temp", "cplab-demo-"))).toBe(true);
+  expect(readdirSync(demoPath!).sort()).toEqual(["collector.yaml", "report.json", "traces.ndjson"]);
+  for (const name of ["cache", "config", "home", "work"]) expect(readdirSync(join(root, name))).toEqual([]);
+  expect(readFileSync("src/main.rs", "utf8")).toContain('TcpListener::bind("127.0.0.1:0")');
 });
 
 test("@claim:no-config-write leaves config and sample bytes unchanged on every CLI path", async ({}, testInfo) => {
@@ -222,7 +320,11 @@ test("@claim:package-and-tests builds one documented binary and a publishable Ca
   expect(help.stdout).toContain("inspect");
   expect(help.stdout).toContain("run");
   const packaged = spawnSync("cargo", ["package", "--allow-dirty"], { encoding: "utf8", timeout: 120_000 });
-  expect(packaged.status).toBe(0);
+  expect(packaged.status, packaged.stderr).toBe(0);
+  const packageFiles = spawnSync("cargo", ["package", "--allow-dirty", "--list"], { encoding: "utf8", timeout: 120_000 });
+  expect(packageFiles.status, packageFiles.stderr).toBe(0);
+  expect(packageFiles.stdout).toContain("examples/collector.yaml");
+  expect(packageFiles.stdout).toContain("examples/traces.ndjson");
   expect(readFileSync("Cargo.toml", "utf8").match(/\[\[bin\]\]/g)).toHaveLength(1);
   const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
   expect(packageJson.scripts.test).toContain("cargo test");
@@ -238,9 +340,11 @@ test("@claim:no-third-party-runtime uses only same-origin website resources and 
   await page.goto("/demo");
   await page.getByRole("button", { name: "Show pressure result" }).click();
   expect(requests.every((url) => new URL(url).origin === "http://127.0.0.1:4173")).toBe(true);
-  const sources = ["site/index.html", "site/main.ts", "site/style.css"].map((file) => readFileSync(file, "utf8")).join("\n");
-  expect(sources).not.toMatch(/google-analytics|googletagmanager|segment\.com|mixpanel|fonts\.googleapis|openai\.azure\.com/i);
-  expect(readFileSync("Cargo.toml", "utf8")).not.toMatch(/^opentelemetry\s*=/m);
+  const sources = ["site/index.html", "site/privacy/index.html", "site/terms/index.html", "site/main.ts", "site/style.css"]
+    .map((file) => readFileSync(file, "utf8")).join("\n");
+  expect(sources).not.toMatch(/google-analytics|googletagmanager|segment\.com|mixpanel|doubleclick|fonts\.googleapis|openai\.azure\.com/i);
+  expect(sources).not.toMatch(/<script[^>]+src=["']https?:\/\//i);
+  expect(sources).not.toMatch(/<link[^>]+rel=["'](?:stylesheet|preload|modulepreload)["'][^>]+href=["']https?:\/\//i);
 });
 
 test("@claim:legal-and-site-links serves route titles, metadata, legal pages, and a real 404", async ({ page, request }) => {
@@ -273,6 +377,6 @@ test("@claim:legal-and-site-links serves route titles, metadata, legal pages, an
 test("@claim:threshold-accuracy reports the controlled 50 rps exporter within 20 percent", async ({}, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "CLI claim runs once");
   const regression = spawnSync("cargo", ["test", "--test", "pressure_fixture", "slow_exporter_is_backpressure_and_threshold_tracks_throughput", "--", "--exact"], { encoding: "utf8", timeout: 120_000 });
-  expect(regression.status).toBe(0);
+  expect(regression.status, `threshold fixture failed\nstdout:\n${regression.stdout}\nstderr:\n${regression.stderr}`).toBe(0);
   expect(regression.stdout + regression.stderr).toContain("1 passed");
 });

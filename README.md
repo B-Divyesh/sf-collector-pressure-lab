@@ -1,11 +1,11 @@
 # Collector Pressure Lab
 
 Collector Pressure Lab tests when a local OpenTelemetry Collector queues, slows, or drops telemetry.
-It is for operators checking queue, batch, or exporter settings before a production change.
+It is for operators checking queue, batch, or exporter config values before a production change.
 
 The CLI reads Collector YAML and replays a bounded JSON or NDJSON sample.
 It increases request rates, reads optional metrics, and reports the first pressure threshold.
-It never edits the configuration.
+It never edits the Collector config.
 
 Try the isolated sample at <https://collector-pressure-lab.sociobot.in/demo>.
 Synthetic results do not predict production capacity.
@@ -26,18 +26,17 @@ Prepare the publishable source package without publishing it:
 cargo package
 ```
 
-Version 0.1.0 is distributed as source through Cargo.
-Factory registry credentials are not included.
+Version 0.1.0 can be packaged from this repository with Cargo.
 
 ## Try the bundled sample
 
-Run one command without an account or Collector setup:
+Run the bundled sample with one command:
 
 ```sh
 cplab demo
 ```
 
-The command copies the bundled config and telemetry sample into a temporary directory.
+The command copies the bundled Collector config and telemetry sample into a temporary directory.
 It starts a temporary loopback receiver, runs the pressure test, and writes `report.json` beside the copied inputs.
 The final output prints that directory.
 
@@ -74,14 +73,14 @@ cplab run --config collector.yaml --sample sample.json \
   --rates 100,200 --duration 1s --json --ci
 ```
 
-`--ci` removes status animation and returns a non-zero code when the test cannot run.
+`--ci` returns a non-zero code when the test cannot run.
 A completed run exits 0, even when every HTTP response is non-2xx.
 Use the JSON classification field for policy decisions.
 
 Exit codes:
 
 - `0`: test completed
-- `2`: argument, input, safety, or configuration error
+- `2`: argument, input, safety, or config error
 - `3`: no HTTP response could be measured
 
 Use `--header 'name:value'` when a local receiver requires metadata.
@@ -89,16 +88,16 @@ Remote hosts are rejected by default.
 Use `--allow-remote` only on a controlled test network.
 The CLI warns you and sends samples only to the endpoint you choose.
 
-## Inspect Collector settings
+## Inspect Collector config
 
-Read config settings without sending traffic:
+Read Collector config values without sending traffic:
 
 ```sh
 cplab inspect --config ./examples/collector.yaml
 cplab inspect --config ./examples/collector.yaml --json
 ```
 
-The parser reads these Collector queue and batch settings:
+The parser reads these Collector queue and batch config values:
 
 - `sending_queue.enabled`
 - `sending_queue.queue_size`
@@ -122,7 +121,7 @@ The threshold uses the lowest pressured step and measured successful throughput.
 The CLI tests at the Collector's OTLP/HTTP input.
 It cannot see memory spikes or downstream throttling outside the test window.
 It cannot read queue state when self-metrics are off.
-Suggested settings are next tests, not automatic configuration changes.
+Suggested config values are next tests, not automatic config changes.
 
 ## Run the site
 
@@ -144,19 +143,17 @@ cargo clippy --all-targets --all-features -- -D warnings
 cargo package
 ```
 
-`npm test` runs Rust, browser-model, build, and browser tests.
 The CLI integration suite includes a controlled slow receiver.
-Every visitor-facing claim is listed in [.factory/claims.json](.factory/claims.json).
+See [.factory/claims.json](.factory/claims.json) for the declared claim tests.
 
 ## Privacy and scope
 
-The site has no analytics, account, upload, or third-party runtime request.
+The site sends no analytics or third-party runtime requests.
 Outside demo mode, the browser model stores no inputs.
-CLI inputs stay local except for bounded bodies sent to your chosen endpoint.
+The CLI creates no persistent telemetry copy. It connects only to the test and metrics endpoints you choose.
 Read the [privacy](https://collector-pressure-lab.sociobot.in/privacy/) and [terms](https://collector-pressure-lab.sociobot.in/terms/) pages.
 
 Collector Pressure Lab is independent of the OpenTelemetry project.
-It bundles no OpenTelemetry source or assets.
 
 ## License
 

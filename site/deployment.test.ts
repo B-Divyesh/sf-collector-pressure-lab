@@ -26,4 +26,16 @@ describe("Azure Static Web Apps cache contract", () => {
     expect(config.routes.find((entry) => entry.route === "/demo")).toMatchObject({ rewrite: "/demo/index.html" });
     expect(config.responseOverrides["404"]).toEqual({ rewrite: "/404/index.html" });
   });
+
+  it("keeps one independently runnable tagged test for every declared claim", () => {
+    const claims = JSON.parse(readFileSync(new URL("../.factory/claims.json", import.meta.url), "utf8")) as Array<{ id: string; test: string }>;
+    const claimTests = readFileSync(new URL("./tests/claims.spec.ts", import.meta.url), "utf8");
+    expect(new Set(claims.map(({ id }) => id)).size).toBe(claims.length);
+    for (const { id, test } of claims) {
+      expect(test).toBe(`npm run test:claims -- --grep @claim:${id}`);
+      expect(claimTests.match(new RegExp(`@claim:${id}(?![a-z0-9-])`, "g"))).toHaveLength(1);
+    }
+    expect([...claimTests.matchAll(/@claim:([a-z0-9-]+)/g)].map((match) => match[1]).sort())
+      .toEqual(claims.map(({ id }) => id).sort());
+  });
 });

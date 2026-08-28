@@ -43,10 +43,24 @@
   },
   {
     "id": "classification",
-    "claim": "The CLI reports stable, backpressure, or drops and emits scriptable JSON, including complete non-2xx loss.",
+    "claim": "The CLI reports stable, backpressure, or drops, emits scriptable JSON, and returns documented execution exit codes.",
     "where": "landing, CLI output, README classification",
     "test": "npm run test:claims -- --grep @claim:classification",
     "sandbox": "temporary fast, slow, and all-503 loopback receivers; assert classifications, counts, JSON, and exit behavior"
+  },
+  {
+    "id": "collector-metrics",
+    "claim": "The CLI reads queue, capacity, refusal, and failure changes from the default Collector metrics endpoint when available.",
+    "where": "landing measurements, privacy page, README",
+    "test": "npm run test:claims -- --grep @claim:collector-metrics",
+    "sandbox": "temporary loopback telemetry receiver and changing Prometheus fixture at the documented default 127.0.0.1:8888/metrics endpoint; assert paths and report deltas"
+  },
+  {
+    "id": "cli-data-boundary",
+    "claim": "The CLI creates no persistent telemetry copy and connects only to selected test and metrics endpoints; demo traffic stays on loopback.",
+    "where": "landing limits, privacy page, README",
+    "test": "npm run test:claims -- --grep @claim:cli-data-boundary",
+    "sandbox": "isolated HOME, config, cache, temp, input, and working directories; capture selected endpoint requests and inspect every created file after inspect, run, and demo"
   },
   {
     "id": "no-config-write",
@@ -57,7 +71,7 @@
   },
   {
     "id": "package-and-tests",
-    "claim": "The project builds one documented Rust binary and produces a publishable Cargo source package.",
+    "claim": "The project builds one documented Rust binary and produces a Cargo source package containing the bundled demo inputs.",
     "where": "landing CLI section, README install and test sections",
     "test": "npm run test:claims -- --grep @claim:package-and-tests",
     "sandbox": "clean build output; run --help, inspect the single binary declaration, and execute cargo package verification"

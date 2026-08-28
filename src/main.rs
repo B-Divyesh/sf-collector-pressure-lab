@@ -21,17 +21,17 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Run a safe sample against a temporary loopback receiver
+    /// Run the bundled sample against a temporary loopback receiver
     Demo,
     /// Replay a bounded sample through a local Collector
     Run(RunArgs),
-    /// Show pressure-relevant settings without sending traffic
+    /// Show Collector config values without sending traffic
     Inspect(InspectArgs),
 }
 
 #[derive(Args)]
 struct InspectArgs {
-    /// OpenTelemetry Collector YAML configuration
+    /// OpenTelemetry Collector YAML config file
     #[arg(short, long)]
     config: PathBuf,
     /// Emit stable machine-readable JSON
@@ -41,7 +41,7 @@ struct InspectArgs {
 
 #[derive(Args)]
 struct RunArgs {
-    /// OpenTelemetry Collector YAML configuration
+    /// OpenTelemetry Collector YAML config file
     #[arg(short, long)]
     config: PathBuf,
     /// JSON payload or NDJSON request bodies (max 8 MiB / 10,000 lines)
@@ -108,7 +108,7 @@ fn execute(cli: Cli) -> Result<(), (u8, String)> {
                     serde_json::to_string_pretty(&config).map_err(|e| (2, e.to_string()))?
                 );
             } else {
-                println!("COLLECTOR PRESSURE SETTINGS");
+                println!("COLLECTOR CONFIG VALUES");
                 println!(
                     "  sending queue  {}",
                     option_bool(config.sending_queue_enabled)
@@ -308,7 +308,7 @@ fn print_report(report: &Report) {
         }
         None => println!("\nNo pressure threshold found inside the tested envelope."),
     }
-    println!("\nNEXT SETTINGS TO TEST");
+    println!("\nNEXT CONFIG VALUES TO TEST");
     for hypothesis in &report.hypotheses {
         println!("  - {hypothesis}");
     }

@@ -132,6 +132,7 @@ function setupDemo(runModel: (() => void) | undefined) {
   document.body.classList.add("demo-mode");
   document.title = "Demo — Collector Pressure Lab";
   document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute("href", "https://collector-pressure-lab.sociobot.in/demo");
+  document.querySelector<HTMLMetaElement>('meta[property="og:url"]')?.setAttribute("content", "https://collector-pressure-lab.sociobot.in/demo");
   for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
     document.querySelector<HTMLMetaElement>(selector)?.setAttribute("content", "Demo — Collector Pressure Lab");
   }

@@ -6,6 +6,11 @@ test("opens the isolated sample in one click with a complete result", async ({ p
   page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
   await page.goto("/");
   await expect(page.locator("h1")).toHaveCount(1);
+  await expect(page.locator("h1")).toHaveText("Find your Collector's pressure threshold");
+  await expect(page.locator(".hero-lede")).toHaveText("For OpenTelemetry operators testing when a local Collector queues, slows, or drops telemetry.");
+  await expect(page.locator(".action-hint")).toHaveText("Loads the bundled sample and shows the result.");
+  await expect(page.locator(".hero-facts li")).toHaveText(["Free to use.", "Works offline after the first visit.", "Runs against loopback by default."]);
+  expect((await page.locator(".hero-facts").boundingBox())!.y + (await page.locator(".hero-facts").boundingBox())!.height).toBeLessThan(page.viewportSize()!.height);
   await page.getByRole("link", { name: "Try it with sample data" }).click();
   await expect(page).toHaveURL(/\/demo$/);
   await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
@@ -23,8 +28,14 @@ test("supports keyboard operation and serious accessibility checks", async ({ pa
   const before = await page.locator("#arrival-rate").inputValue();
   await page.keyboard.press("ArrowRight");
   expect(Number(await page.locator("#arrival-rate").inputValue())).toBeGreaterThan(Number(before));
-  const results = await new AxeBuilder({ page }).analyze();
-  expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? ""))).toEqual([]);
+  for (const route of ["/", "/demo", "/privacy/", "/terms/", "/404"]) {
+    await page.goto(route);
+    await expect(page.locator("h1")).toHaveCount(1);
+    await expect(page.locator("main")).toHaveCount(1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact ?? ""))).toEqual([]);
+  }
 });
 
 test("publishes privacy and terms pages", async ({ page }) => {
@@ -77,12 +88,29 @@ test("focuses and aligns deep links after layout", async ({ page }) => {
 });
 
 test("keeps every visible link and button at least 44 by 44 CSS pixels", async ({ page }) => {
+  for (const route of ["/", "/demo", "/privacy/", "/terms/", "/404"]) {
+    await page.goto(route);
+    const tooSmall = await page.locator("a:visible, button:visible").evaluateAll((elements) => elements.flatMap((element) => {
+      const box = element.getBoundingClientRect();
+      return box.width < 44 || box.height < 44 ? [{ text: element.textContent?.trim(), width: box.width, height: box.height }] : [];
+    }));
+    expect(tooSmall).toEqual([]);
+  }
+});
+
+test("keeps valid routes console-clean and removes motion when requested", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const route of ["/", "/demo", "/privacy/", "/terms/"]) await page.goto(route);
   await page.goto("/");
-  const tooSmall = await page.locator("a:visible, button:visible").evaluateAll((elements) => elements.flatMap((element) => {
-    const box = element.getBoundingClientRect();
-    return box.width < 44 || box.height < 44 ? [{ text: element.textContent?.trim(), width: box.width, height: box.height }] : [];
-  }));
-  expect(tooSmall).toEqual([]);
+  const motion = await page.locator(".poster-frame").evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { animation: style.animationDuration, transition: style.transitionDuration };
+  });
+  expect(Number.parseFloat(motion.animation)).toBeLessThanOrEqual(0.000001);
+  expect(Number.parseFloat(motion.transition)).toBeLessThanOrEqual(0.000001);
+  expect(errors).toEqual([]);
 });
 
 test("installs the offline shell when the deployment control file is not public", async ({ page, context, browserName }) => {

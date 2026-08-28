@@ -1,55 +1,47 @@
-# Collector Pressure Lab — verification handoff
+# Collector Pressure Lab — review 1 handoff
 
-Work order: `collector-pressure-lab-verify-3`
-Candidate/source commit: `c7a3c8004d96e3bf7d8df4d15c48e515737c3bd2`
-Live URL: https://collector-pressure-lab.sociobot.in/
-Verified: 2026-08-28
+Work order: `collector-pressure-lab-review-1`
 
-## Status: PASS
+Reviewed source: `af12a3031cf5ffb642604fb9b200f25e864be0a8`
 
-The candidate is buildable, packaged, functionally verified, and its live
-deployment exactly matches the production build. The previously reported
-deployment-only service-worker failure is resolved: a fresh live worker
-installs and controls the page, survives `registration.update()`, and reloads
-the offline shell. Full evidence is in `.factory/verification-3.md`.
+Live URL: <https://collector-pressure-lab.sociobot.in/>
 
-## What passed
+Reviewed: 2026-08-28
 
-- `npm ci`, `npm test`, `npm run build`, Clippy with `-D warnings`, release
-  build, `cargo package --allow-dirty`, and production dependency audit (0
-  vulnerabilities).
-- A clean consumer-root install provides the documented single `cplab` binary
-  with useful help and JSON inspection output.
-- Independent loopback fixtures verified stable behavior, backpressure
-  threshold accuracy (49.34 rps for a 50 rps serial receiver), all-503 drop
-  classification, invalid-input handling, loopback protection, and exit-3
-  recovery for an unavailable local endpoint.
-- Live desktop and 390 px mobile checks passed: model interaction, keyboard
-  operation, visible focus, reduced motion, zero axe serious/critical findings,
-  zero console/page errors, same-origin-only runtime requests, PWA offline
-  reload, legal pages, privacy behavior, caching, and response checks.
-- Local/deployed HTML, worker, CSS, JS, and hero-image SHA-256 values match.
-  Lighthouse mobile: 99 Performance / 100 Accessibility / 100 Best Practices
-  / 100 SEO; LCP 1,438 ms, CLS 0, TBT 133 ms.
+## Status: FAIL
 
-## Defects and follow-up
+An adversarial cold-read review was completed without changing product code.
+The full report is `.factory/review-1.md`.
 
-- **P3, non-blocking:** production responses lack Content-Security-Policy and
-  Permissions-Policy. Add restrictive static headers when deployment policy is
-  next changed, then confirm service-worker and offline behavior remain intact.
-- Intentional limits: bounded OTLP/HTTP-like JSON only; no gRPC, TLS, protobuf,
-  automatic Collector provisioning, or production capacity guarantee.
+Blocking issues are: the hero does not name the intended user or plain job; no
+one-click isolated sample demo exists for the site or CLI; `.factory/claims.json`
+and tagged claim tests are absent; all landing/README claims are therefore
+unlisted; `/demo`, unknown-route, deep-link, and 404 behavior are broken; and
+the prior CSP/Permissions-Policy finding remains unfixed.
 
-## Run and verify
+## Verification performed
 
-```sh
-npm ci
-npm test
-cargo clippy --all-targets --all-features -- -D warnings
-cargo build --release
-cargo package --allow-dirty
-./target/release/cplab inspect --config examples/collector.yaml --json
-```
+- Fresh Chromium at 390 × 844 and 1440 × 900, before scroll.
+- Live primary action, `/demo`, `?demo=1`, Privacy, Terms, unknown route,
+  deep-link, Back, focus, console, storage, same-origin network, service-worker,
+  offline reload, and browser-model checks.
+- Link crawl, live headers, metadata, robots/sitemap, route structure, and
+  source/live SHA-256 comparison.
+- All earlier verification reports and the previous handoff were rechecked.
+- Full landing and README sentence audit with word counts, terminology, heading,
+  jargon, claim, and action flags.
+- `cplab demo` from a fresh temporary directory.
+- `npm test`: passed all Rust, CLI, fixture, doctest, Vitest, build, and 10
+  Playwright checks; `dist/site` was produced.
+- Live axe scan at 390 px: zero serious or critical violations.
 
-Do not publish from this checkout. `cargo package --allow-dirty` prepares the
-ready-to-publish source package; registry credentials are factory-owned.
+## Product changes
+
+None. Only `.factory/review-1.md` and this handoff were written.
+
+## Next verification
+
+After repair, rerun the entire checklist rather than only the blockers. In
+particular, execute every new `.factory/claims.json` command from a clean state
+and test the sample demo's reset, exit, storage namespace, offline behavior,
+and CLI temporary-directory output.

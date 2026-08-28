@@ -1,81 +1,60 @@
-# Collector Pressure Lab — polish 2 handoff
+# Collector Pressure Lab — review 3 handoff
 
-Work order: `collector-pressure-lab-polish-2`
+Work order: `collector-pressure-lab-review-3`
 
-Source commits: `0e84232`, `dda09e7`, `45273e2`, `e19376b`
+Reviewed source: `d44c5c9cf8ef9d542a5079ae071f610bf811b6ba`
 
 Live URL: <https://collector-pressure-lab.sociobot.in/>
 
 Completed: 2026-08-28
 
-## Status: complete
+## Status: review complete, product verdict FAIL
 
-Every finding in `review-1.md` and `review-2.md` is resolved.
-The CLI remains a Rust single binary, and the deployment remains a static Vite site.
-The art-deco transit-poster identity is unchanged.
+No product code was modified. The full adversarial report is
+`.factory/review-3.md`.
 
-## Delivered
+## What was verified
 
-- Rewrote the first screen around the Collector pressure-threshold job and its OpenTelemetry audience.
-- Added a one-click, precomputed `/demo` and `/?demo=1` flow with a persistent banner, reset, exit, and `demo:` storage isolation.
-- Added `cplab demo`; it runs bundled samples against a temporary loopback receiver and writes its report only under `/tmp`.
-- Added `.factory/claims.json` with 12 one-to-one tagged tests and `.factory/demo.md` with the sandbox contract.
-- Added real demo, privacy, terms, designed 404, unknown-route status, sitemap, metadata, focus, history, and deep-link behavior.
-- Added CSP, Permissions Policy, immutable hashed-asset caching, and offline route-aware service-worker fallbacks.
-- Rewrote every flagged heading and sentence, added a copy audit, fixed mobile hit targets, and identified the external source link.
-- Added original-art derivatives for Open Graph and the Apple touch icon; provenance is in `.factory/design.md`.
+- Cold 390 × 844 and 1440 × 900 first screens.
+- One-click web demo, populated result, reset, exit, storage isolation, offline
+  reload, network boundary, and CLI temporary-directory demo.
+- All 12 `.factory/claims.json` commands independently in a clean clone.
+- Full `npm test`, Clippy with warnings denied, production build, package claim,
+  and production dependency audit.
+- Live routes, titles, metadata, 404 status/design, deep links, Back/focus,
+  crawl, touch targets, Axe, reduced motion, headers, cache policy, and worker.
+- Every earlier review, polish, verification, and handoff finding in live code
+  and source.
+- Every landing-page and README sentence, heading, action, term, and claim.
 
-The finding-by-finding map is in `.factory/polish-2.md`.
+## Result
 
-## How to verify
+- Blocking F-3-1: `npm test` intermittently failed the tagged
+  `@claim:threshold-accuracy` case. One clean-clone run failed; its immediate
+  rerun and a separate fresh-clone run passed.
+- Blocking reopened F-1-4: several self-metrics, CLI privacy, packaging,
+  `--ci`, test-composition, licensing-boundary, and quantitative statements
+  are not fully represented and observably asserted by the claims manifest.
+- Minor F-3-2 through F-3-4: vague “safe sample” copy, factory-internal
+  credential jargon, and inconsistent config terminology.
+
+## Verification commands
 
 ```sh
 npm ci
+npm run test:claims -- --grep @claim:<id>
 npm test
-npm run test:claims
 cargo clippy --all-targets --all-features -- -D warnings
-cargo build --release
-cargo package --allow-dirty
 npm audit --omit=dev
 ```
 
-Run one claim independently with:
+The 12 independent claim commands passed. `npm test` passed on two runs and
+failed on one run as described above. Clippy passed, audit reported zero
+vulnerabilities, and `dist/site` was produced.
 
-```sh
-npm run test:claims -- --grep @claim:demo-isolation
-```
+## Next steps
 
-Every command listed in `.factory/claims.json` was also run independently from a clean clone.
-
-## Exact evidence
-
-- `npm test`: 4 Rust unit, 4 CLI contract, 3 pressure fixture, 1 doctest, 5 Vitest, and 35 Playwright cases passed; 7 duplicate mobile CLI cases skipped by design.
-- `npm run test:claims`: 17 browser/project cases passed; 7 duplicate mobile CLI cases skipped by design.
-- `cargo clippy --all-targets --all-features -- -D warnings`: passed.
-- `cargo build --release`: passed.
-- `cargo package --allow-dirty`: verified one 0.1.0 source package. Nothing was published.
-- `npm audit --omit=dev`: zero vulnerabilities.
-- `dist/site`: JS 6.38 KB raw / 2.69 KB gzip; CSS 15.86 KB raw / 4.33 KB gzip.
-- Local route axe sweep: zero violations on `/`, `/demo`, `/privacy/`, `/terms/`, and `/404` at 1440 and 390 px.
-- Live route axe sweep: zero violations on all public routes and the unknown-path 404 at both viewports.
-- Live valid routes: zero console or page errors; no horizontal overflow; every visible control is at least 44×44 px.
-- Live demo: `Drops` is visible in the first viewport; reset returns arrival rate to 900; exit clears demo storage.
-- Live privacy: the complete demo flow made only same-origin requests.
-- Live offline: the service worker controls the page and reloads the populated demo offline.
-- Live headers: CSP and Permissions Policy are present; hashed CSS remains immutable.
-- Live Lighthouse mobile: 99 Performance, 100 Accessibility, 96 Best Practices, 100 SEO; LCP 1.4 s, CLS 0, TBT 100 ms.
-- Live root and service-worker SHA-256 values match `dist/site`.
-- Local evidence: `.factory/evidence/local/`.
-- Live evidence: `.factory/evidence/live/`.
-- Successful deployment id: `f26819bd-7b05-46e6-b601-aa59e01eea1a`.
-
-## Deploy
-
-```sh
-npm ci && npm run build:site
-/opt/fleet/lib/deploy-static.sh collector-pressure-lab dist/site
-```
-
-## Known gaps and next steps
-
-None. No review finding, claim, test, or deployment check remains unresolved.
+Stabilize the threshold claim under the full suite, make child-process failure
+output visible, then map or remove every claim listed under F-1-4. Apply the
+three copy rewrites and rerun review 3 from a fresh clone and fresh browser
+contexts.

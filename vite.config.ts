@@ -4,6 +4,9 @@ import { resolve, relative } from "node:path";
 import { defineConfig, type Plugin } from "vite";
 
 const outDir = resolve(import.meta.dirname, "dist/site");
+// Azure Static Web Apps consumes this file at deploy time but does not publish it.
+// Keep it in the build output for the host while excluding it from browser precache.
+const deploymentControlFiles = new Set(["staticwebapp.config.json"]);
 
 function offlineShell(): Plugin {
   return {
@@ -14,7 +17,9 @@ function offlineShell(): Plugin {
         for (const name of readdirSync(directory)) {
           const file = resolve(directory, name);
           if (statSync(file).isDirectory()) walk(file);
-          else if (name !== "sw.js" && name !== "_headers") files.push(`/${relative(outDir, file).replaceAll("\\", "/")}`);
+          else if (name !== "sw.js" && name !== "_headers" && !deploymentControlFiles.has(name)) {
+            files.push(`/${relative(outDir, file).replaceAll("\\", "/")}`);
+          }
         }
       };
       walk(outDir);

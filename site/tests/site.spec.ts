@@ -44,3 +44,19 @@ test("reopens the model shell offline", async ({ page, context, browserName }) =
   await page.reload();
   await expect(page.getByRole("button", { name: /Run the model/ })).toBeVisible();
 });
+
+test("installs the offline shell when the deployment control file is not public", async ({ page, context, browserName }) => {
+  test.skip(browserName !== "chromium", "service worker check uses Chromium");
+  let deploymentControlRequests = 0;
+  await context.route("**/staticwebapp.config.json", async (route) => {
+    deploymentControlRequests += 1;
+    await route.fulfill({ status: 404, body: "Not found" });
+  });
+
+  await page.goto("/");
+  const worker = await page.evaluate(async () => fetch("/sw.js").then((response) => response.text()));
+  expect(worker).not.toContain("staticwebapp.config.json");
+  await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+  expect(deploymentControlRequests).toBe(0);
+});

@@ -60,6 +60,7 @@ test("@claim:demo-isolation opens populated sample data and clears only its name
   await expect(page).toHaveTitle("Demo — Collector Pressure Lab");
   await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
   await expect(page.locator("#classification")).toHaveText("Drops");
+  expect((await page.locator("#classification").boundingBox())!.y).toBeLessThan(page.viewportSize()!.height);
   expect(await page.evaluate(() => Object.keys(localStorage))).toEqual(["demo:cplab:pressure-input"]);
   await page.locator("#arrival-rate").evaluate((element: HTMLInputElement) => {
     element.value = "1200";
@@ -73,6 +74,7 @@ test("@claim:demo-isolation opens populated sample data and clears only its name
   await page.goto("/?demo=1");
   await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
   await expect(page.locator("#classification")).toHaveText("Drops");
+  expect((await page.locator("#classification").boundingBox())!.y).toBeLessThan(page.viewportSize()!.height);
 
   const directory = mkdtempSync(join(tmpdir(), "cplab-claim-demo-"));
   const output = run(["demo"], directory);

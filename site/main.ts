@@ -160,7 +160,7 @@ function focusRouteTarget() {
   const target = hashTarget?.querySelector<HTMLElement>("h2, h1") ?? hashTarget;
   const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
   const cameFromThisSite = document.referrer.startsWith(location.origin);
-  const shouldFocusHeading = location.pathname !== "/" || cameFromThisSite || navigation?.type === "back_forward";
+  const shouldFocusHeading = isDemoMode() || location.pathname !== "/" || cameFromThisSite || navigation?.type === "back_forward";
   const focusTarget = target ?? (shouldFocusHeading ? document.querySelector<HTMLElement>("h1") : null);
   if (!focusTarget) return;
   focusTarget.tabIndex = -1;

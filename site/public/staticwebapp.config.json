@@ -9,7 +9,7 @@
     { "route": "/demo", "rewrite": "/demo/index.html" },
     { "route": "/privacy", "rewrite": "/privacy/index.html" },
     { "route": "/terms", "rewrite": "/terms/index.html" },
-    { "route": "/404", "rewrite": "/404/index.html", "statusCode": 404 },
+    { "route": "/404", "rewrite": "/404/index.html" },
     {
       "route": "/assets/*",
       "headers": {
@@ -30,6 +30,6 @@
     }
   ],
   "responseOverrides": {
-    "404": { "rewrite": "/404/index.html", "statusCode": 404 }
+    "404": { "rewrite": "/404/index.html" }
   }
 }

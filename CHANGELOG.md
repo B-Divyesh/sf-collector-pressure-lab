@@ -10,6 +10,7 @@ versioning beginning at 0.1.0.
 - Added isolated end-to-end claim evidence for Collector self-metrics and CLI data boundaries.
 - Serialized timing-sensitive browser claim checks and retained child-process diagnostics on failure.
 - Replaced vague demo and packaging copy with tested, consistent Collector config terms.
+- Limited the Cargo source package to the CLI, tests, examples, license, and user documentation.
 
 ## [0.1.0] - 2026-08-27
 

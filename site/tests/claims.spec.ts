@@ -325,6 +325,8 @@ test("@claim:package-and-tests builds one documented binary and a publishable Ca
   expect(packageFiles.status, packageFiles.stderr).toBe(0);
   expect(packageFiles.stdout).toContain("examples/collector.yaml");
   expect(packageFiles.stdout).toContain("examples/traces.ndjson");
+  expect(packageFiles.stdout).not.toContain(".factory/");
+  expect(packageFiles.stdout).not.toContain("site/");
   expect(readFileSync("Cargo.toml", "utf8").match(/\[\[bin\]\]/g)).toHaveLength(1);
   const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
   expect(packageJson.scripts.test).toContain("cargo test");

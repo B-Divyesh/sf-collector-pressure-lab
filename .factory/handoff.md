@@ -1,8 +1,8 @@
-# Collector Pressure Lab — review 1 handoff
+# Collector Pressure Lab — review 2 handoff
 
-Work order: `collector-pressure-lab-review-1`
+Work order: `collector-pressure-lab-review-2`
 
-Reviewed source: `af12a3031cf5ffb642604fb9b200f25e864be0a8`
+Reviewed source: `868ec12fd77d671ecb844cbca21cbd882ef5c251`
 
 Live URL: <https://collector-pressure-lab.sociobot.in/>
 
@@ -10,38 +10,42 @@ Reviewed: 2026-08-28
 
 ## Status: FAIL
 
-An adversarial cold-read review was completed without changing product code.
-The full report is `.factory/review-1.md`.
+The complete adversarial report is `.factory/review-2.md`. No product code was
+changed. All 35 unresolved review-1 findings were confirmed in live behavior
+and source and reopened as blocking under the required history rule. Two new
+minor findings cover sub-44 px targets and the unlabelled external Source link.
 
-Blocking issues are: the hero does not name the intended user or plain job; no
-one-click isolated sample demo exists for the site or CLI; `.factory/claims.json`
-and tagged claim tests are absent; all landing/README claims are therefore
-unlisted; `/demo`, unknown-route, deep-link, and 404 behavior are broken; and
-the prior CSP/Permissions-Policy finding remains unfixed.
+Primary blockers remain the unclear first screen, missing one-click isolated
+web and CLI demo, absent `.factory/claims.json` and tagged claim tests, broken
+demo/404/deep-link behavior, missing policy and metadata requirements,
+inconsistent route skeleton, and unresolved plain-language findings.
 
 ## Verification performed
 
-- Fresh Chromium at 390 × 844 and 1440 × 900, before scroll.
-- Live primary action, `/demo`, `?demo=1`, Privacy, Terms, unknown route,
-  deep-link, Back, focus, console, storage, same-origin network, service-worker,
-  offline reload, and browser-model checks.
-- Link crawl, live headers, metadata, robots/sitemap, route structure, and
-  source/live SHA-256 comparison.
-- All earlier verification reports and the previous handoff were rechecked.
-- Full landing and README sentence audit with word counts, terminology, heading,
-  jargon, claim, and action flags.
-- `cplab demo` from a fresh temporary directory.
-- `npm test`: passed all Rust, CLI, fixture, doctest, Vitest, build, and 10
-  Playwright checks; `dist/site` was produced.
-- Live axe scan at 390 px: zero serious or critical violations.
+- Fresh Chromium cold reads at 390 × 844 and 1440 × 900 before scrolling.
+- Live first-click, `/demo`, `?demo=1`, `cplab demo` in a temporary directory,
+  banner/reset/exit, storage, network interception, service-worker, and offline
+  model checks.
+- Root, legal, demo, 404, unknown, hash, forward/back, focus, metadata,
+  headers, robots, sitemap, and full discovered-link crawl.
+- Live axe at both viewports, keyboard focus, console/page errors, and rendered
+  target-size checks.
+- Full landing and README sentence audit with counts, terminology, headings,
+  actions, jargon, and every unlisted claim marked.
+- All earlier review/handoff findings checked individually against live and
+  source. Earlier repaired verification defects were regression-checked.
+- Clean clone: `npm ci` and `npm test` passed 4 Rust unit, 4 CLI contract, 3
+  pressure fixture, 1 doctest, 4 Vitest, and 10 Playwright tests. `dist/site`
+  was produced.
+- Local production HTML, worker, JavaScript, CSS, and hero hashes match live.
 
 ## Product changes
 
-None. Only `.factory/review-1.md` and this handoff were written.
+None. Only `.factory/review-2.md` and this handoff were written.
 
 ## Next verification
 
-After repair, rerun the entire checklist rather than only the blockers. In
-particular, execute every new `.factory/claims.json` command from a clean state
-and test the sample demo's reset, exit, storage namespace, offline behavior,
-and CLI temporary-directory output.
+After repair, rerun the entire checklist from fresh contexts. Execute every
+new claim command independently from a clean clone, then verify demo reset,
+exit, storage isolation, offline behavior, and CLI temporary output before
+rechecking copy, routes, metadata, policies, links, accessibility, and history.

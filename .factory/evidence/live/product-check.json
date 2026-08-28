@@ -1,0 +1,31 @@
+{
+  "initial": {
+    "title": "Demo — Collector Pressure Lab",
+    "banner": true,
+    "classification": "Drops",
+    "resultInViewport": true,
+    "storage": [
+      "demo:cplab:pressure-input"
+    ],
+    "scrollY": 2171,
+    "overflow": 0
+  },
+  "reset": "900",
+  "controlled": true,
+  "offline": {
+    "banner": true,
+    "classification": "Drops",
+    "controlled": true
+  },
+  "exit": {
+    "url": "https://collector-pressure-lab.sociobot.in/",
+    "storage": []
+  },
+  "deep": {
+    "active": "cli-title",
+    "top": -0.15625
+  },
+  "sizes": [],
+  "crossOrigin": [],
+  "errors": []
+}

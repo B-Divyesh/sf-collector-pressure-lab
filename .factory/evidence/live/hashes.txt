@@ -1,0 +1,21 @@
+Checked: 2026-08-28 UTC
+Base URL: https://collector-pressure-lab.sociobot.in
+
+/ index.html
+local f18e1631cd1b0ada3a0a075579b48704fa2f8254f685e9b693bf9bfaf0bf6442
+live  f18e1631cd1b0ada3a0a075579b48704fa2f8254f685e9b693bf9bfaf0bf6442
+
+/sw.js
+local bf828514e08e7057833a406327963b31b0f6e1c29ec5e95f958f1463b219618f
+live  bf828514e08e7057833a406327963b31b0f6e1c29ec5e95f958f1463b219618f
+
+/assets/main-FWSslBG-.js
+local d26a534665e44ba03518e1cdc21973cc20f2eea2522154e670d1840d2bc2df56
+live  d26a534665e44ba03518e1cdc21973cc20f2eea2522154e670d1840d2bc2df56
+
+/assets/main-BQA8HaJ0.css
+local 3572819d9d7650642d2246aa469fcef00b6615a795bec63afd1fdc6e00224a01
+live  3572819d9d7650642d2246aa469fcef00b6615a795bec63afd1fdc6e00224a01
+
+Unknown-path response: 404
+External GitHub source link: 200

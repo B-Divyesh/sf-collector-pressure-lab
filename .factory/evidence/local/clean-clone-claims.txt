@@ -1,0 +1,19 @@
+Clean clone: /tmp/cplab-e193-clean-O1pXni
+Commit: e19376b3dfda7e43600335c2013a77f1b2d2b68e
+Install: npm ci --ignore-scripts (0 vulnerabilities)
+
+Each command from .factory/claims.json ran independently:
+PASS demo-isolation (2 passed)
+PASS offline-reload (2 passed)
+PASS browser-no-network-or-storage (2 passed)
+PASS loopback-guard (1 passed, 1 duplicate mobile project skipped)
+PASS bounded-replay (1 passed, 1 duplicate mobile project skipped)
+PASS config-inspection (1 passed, 1 duplicate mobile project skipped)
+PASS classification (1 passed, 1 duplicate mobile project skipped)
+PASS no-config-write (1 passed, 1 duplicate mobile project skipped)
+PASS package-and-tests (1 passed, 1 duplicate mobile project skipped)
+PASS no-third-party-runtime (2 passed)
+PASS legal-and-site-links (2 passed)
+PASS threshold-accuracy (1 passed, 1 duplicate mobile project skipped)
+
+Result: 12 of 12 claim commands passed.

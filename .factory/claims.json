@@ -7,6 +7,13 @@
     "sandbox": "fresh browser context and fresh temporary working directory; inspect storage keys, reset/exit behavior, CLI output path, and current-directory contents"
   },
   {
+    "id": "free-to-use",
+    "claim": "Collector Pressure Lab is free to use.",
+    "where": "landing hero, terms page",
+    "test": "npm run test:claims -- --grep @claim:free-to-use",
+    "sandbox": "fresh browser context over every public route; assert the free fact, no paid tier, payment or login call to action, price, billing request, or payment-provider runtime"
+  },
+  {
     "id": "offline-reload",
     "claim": "The browser model works offline after the first visit.",
     "where": "landing facts, offline banner, README",

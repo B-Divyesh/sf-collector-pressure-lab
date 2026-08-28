@@ -1,1 +1,1 @@
-Find the request rate where a local OpenTelemetry Collector queues, slows, or drops telemetry.
+Find when a local OpenTelemetry Collector queues, slows, or drops telemetry.

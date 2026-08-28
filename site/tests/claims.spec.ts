@@ -121,6 +121,28 @@ test("@claim:demo-isolation opens populated sample data and clears only its name
   expect(readdirSync(directory)).toEqual([]);
 });
 
+test("@claim:free-to-use publishes no paid tier, price, billing, payment, or login flow", async ({ page, context }) => {
+  const requests: string[] = [];
+  context.on("request", (request) => requests.push(request.url()));
+  const publicRoutes = ["/", "/demo", "/privacy/", "/terms/"];
+  for (const route of publicRoutes) {
+    await page.goto(route);
+    await expect(page).toHaveURL(new RegExp(`${route === "/" ? "\\/$" : route.replaceAll("/", "\\/").replace(/\\\/$/, "\\/?$")}`));
+    const publicText = await page.locator("body").innerText();
+    expect(publicText).not.toMatch(/\b(?:paid tier|pricing|price|subscribe|checkout|billing)\b/i);
+    expect(await page.getByRole("link", { name: /(?:sign in|log in|account|checkout|buy|upgrade|subscribe|billing|payment)/i }).count()).toBe(0);
+    expect(await page.getByRole("button", { name: /(?:sign in|log in|account|checkout|buy|upgrade|subscribe|billing|payment)/i }).count()).toBe(0);
+  }
+  await page.goto("/");
+  await expect(page.getByText("Free to use.", { exact: true })).toBeVisible();
+  await page.goto("/terms/");
+  await expect(page.getByText(/Collector Pressure Lab is free software under the MIT License\./)).toBeVisible();
+  expect(requests.every((url) => new URL(url).origin === "http://127.0.0.1:4173")).toBe(true);
+  const sources = ["site/index.html", "site/privacy/index.html", "site/terms/index.html", "site/404/index.html", "site/main.ts", "site/style.css"]
+    .map((file) => readFileSync(file, "utf8")).join("\n");
+  expect(sources).not.toMatch(/api\.sociobot\.in\/api\/v1|dodo|stripe|paypal|paddle|lemonsqueezy|checkout\.com|braintree|chargebee/i);
+});
+
 test("@claim:offline-reload reloads the demo and runs the browser model offline", async ({ page, context, browserName }) => {
   test.skip(browserName !== "chromium", "service worker behavior is verified in Chromium");
   await page.goto("/demo");

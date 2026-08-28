@@ -12,7 +12,7 @@ Audited 2026-08-28. Words are whitespace-delimited; hyphenated terms count as on
 | 5 | Changes use separate demo storage. | `demo-isolation` |
 | 13 | For OpenTelemetry operators testing when a local Collector queues, slows, or drops telemetry. | `classification` |
 | 8 | Loads the bundled sample and shows the result. | `demo-isolation` |
-| 3 | Free to use. | `legal-and-site-links` |
+| 3 | Free to use. | `free-to-use` |
 | 6 | Works offline after the first visit. | `offline-reload` |
 | 5 | Runs against loopback by default. | `loopback-guard` |
 | 7 | See when incoming telemetry exceeds export capacity. | `classification` |

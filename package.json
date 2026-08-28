@@ -8,7 +8,7 @@
     "build": "npm run build:site",
     "build:site": "tsc --noEmit -p tsconfig.site.json && vite build",
     "test": "cargo test && npm run test:unit && npm run build:site && npm run test:e2e",
-    "test:unit": "vitest run model.test.ts",
+    "test:unit": "vitest run model.test.ts deployment.test.ts",
     "test:e2e": "playwright test"
   },
   "devDependencies": {

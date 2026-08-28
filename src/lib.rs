@@ -84,8 +84,12 @@ pub struct MetricsDelta {
 pub struct StepResult {
     pub offered_rps: u32,
     pub attempted: usize,
+    /// Requests that reached a valid HTTP response, including non-2xx responses.
+    pub responses: usize,
     pub succeeded: usize,
     pub dropped: usize,
+    /// Requests that could not produce an HTTP response (connect, timeout, or protocol error).
+    pub transport_errors: usize,
     pub achieved_rps: f64,
     pub p50_ms: f64,
     pub p95_ms: f64,
@@ -334,8 +338,8 @@ impl Experiment {
         {
             warnings.push("Collector self-metrics were unavailable or contained no recognized pressure metrics; response evidence was used".into());
         }
-        if steps.iter().all(|step| step.succeeded == 0) {
-            return Err("every request failed; check that the local Collector endpoint and signal path are running".into());
+        if steps.iter().all(|step| step.responses == 0) {
+            return Err("no HTTP responses were received; check that the local Collector endpoint and signal path are running".into());
         }
         let classification = if steps
             .iter()
@@ -421,6 +425,7 @@ impl HttpUrl {
 #[derive(Debug)]
 struct RequestResult {
     success: bool,
+    responded: bool,
     latency_ms: f64,
 }
 
@@ -449,10 +454,14 @@ fn run_step(
                     Err(_) => break,
                 };
                 let started = Instant::now();
-                let success = send_http(&url, "POST", Some(&body), &headers, timeout)
-                    .is_ok_and(|status| (200..300).contains(&status));
+                let (success, responded) =
+                    match send_http(&url, "POST", Some(&body), &headers, timeout) {
+                        Ok(status) => ((200..300).contains(&status), true),
+                        Err(_) => (false, false),
+                    };
                 let _ = sender.send(RequestResult {
                     success,
+                    responded,
                     latency_ms: started.elapsed().as_secs_f64() * 1000.0,
                 });
             }
@@ -482,9 +491,13 @@ fn run_step(
     drop(work_tx);
     let mut latencies = Vec::with_capacity(attempted);
     let mut succeeded = 0;
+    let mut responses = 0;
     for result in result_rx.iter().take(attempted) {
         if result.success {
             succeeded += 1;
+        }
+        if result.responded {
+            responses += 1;
         }
         latencies.push(result.latency_ms);
     }
@@ -498,8 +511,10 @@ fn run_step(
     Ok(StepResult {
         offered_rps: rate,
         attempted,
+        responses,
         succeeded,
         dropped: attempted.saturating_sub(succeeded),
+        transport_errors: attempted.saturating_sub(responses),
         achieved_rps: succeeded as f64 / elapsed,
         p50_ms,
         p95_ms,

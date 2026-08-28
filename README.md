@@ -60,12 +60,14 @@ cplab run --config collector.yaml --sample sample.json \
 ```
 
 `--ci` disables status animation and returns a non-zero exit code when the run
-cannot be performed. A completed run exits 0 even when it discovers pressure;
-the JSON `classification` field is intended for policy decisions. Exit codes:
+cannot be performed. A completed run exits 0 even when it discovers pressure,
+including when every received HTTP response is non-2xx; the JSON
+`classification` field is intended for policy decisions. Exit codes:
 
 - `0`: experiment completed
 - `2`: arguments, input, safety check, or configuration error
-- `3`: every request failed, so no threshold could be measured
+- `3`: no HTTP response could be measured (for example, every connection or
+  request timed out)
 
 Use `--header 'name:value'` for a local test receiver that requires metadata.
 Remote hosts are rejected. `--allow-remote` exists for controlled lab networks
@@ -86,8 +88,8 @@ Unknown or templated values are reported, not guessed.
 
 ## How classification works
 
-At each offered rate, the lab records attempts, successful responses, transport
-errors/non-2xx drops, response latency, achieved request throughput, and deltas
+At each offered rate, the lab records attempts, HTTP responses, successful
+responses, transport errors/non-2xx drops, response latency, achieved request throughput, and deltas
 from common `otelcol_*` queue/refusal/failure counters when metrics are exposed.
 The first step with explicit failures/refusals is **drops**. A step with rising
 latency, exporter queue growth, or materially lower achieved throughput is

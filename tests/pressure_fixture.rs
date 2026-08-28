@@ -107,3 +107,17 @@ fn non_success_responses_are_drops() {
     assert_eq!(report.classification, Classification::Drops);
     assert!(report.steps[0].dropped > 0);
 }
+
+#[test]
+fn all_non_success_responses_are_a_measured_drop_result() {
+    let fixture = Fixture::start(Duration::from_millis(1), Some(1));
+    let report = experiment(fixture.endpoint.clone(), vec![30])
+        .run(&sample(), ConfigSummary::default())
+        .unwrap();
+
+    assert_eq!(report.classification, Classification::Drops);
+    assert_eq!(report.steps[0].succeeded, 0);
+    assert_eq!(report.steps[0].responses, report.steps[0].attempted);
+    assert_eq!(report.steps[0].transport_errors, 0);
+    assert_eq!(report.steps[0].dropped, report.steps[0].attempted);
+}

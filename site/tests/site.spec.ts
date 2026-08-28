@@ -76,6 +76,14 @@ test("serves a real 404 and complete route metadata", async ({ page, request }) 
   await page.goto("/demo");
   await expect(page).toHaveTitle("Demo — Collector Pressure Lab");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /\/demo$/);
+  await expect(page.locator("#arrival-rate")).toHaveValue("900");
+  await expect(page.locator("#export-capacity")).toHaveValue("400");
+  await expect(page.locator("#queue-capacity")).toHaveValue("1200");
+  await expect(page.locator("#burst-seconds")).toHaveValue("10");
+  await page.goto("/404");
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", "https://collector-pressure-lab.sociobot.in/404");
+  await page.goto("/missing-review-route");
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", "https://collector-pressure-lab.sociobot.in/404");
 });
 
 test("focuses and aligns deep links after layout", async ({ page }) => {

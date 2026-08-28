@@ -1,1 +1,1 @@
-Find when a local OpenTelemetry Collector queues, slows, or drops telemetry.
+Test a local OpenTelemetry Collector to find when telemetry queues, slows, or drops.

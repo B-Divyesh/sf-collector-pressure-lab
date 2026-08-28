@@ -1,4 +1,4 @@
-# Copy audit — perfection loop round 4
+# Copy audit — perfection loop round 5
 
 Audited 2026-08-28. Words are whitespace-delimited; hyphenated terms count as one word. No sentence exceeds 22 words. No sentence uses a banned marketing word. Every visitor-facing factual promise maps to a claim below; instructions and scope warnings are marked “instruction” or “scope.”
 
@@ -101,6 +101,7 @@ Commands, headings, URL labels, and exit-code labels are excluded. Each prose se
 | 6 | The final output prints that directory. | `demo-isolation` |
 | 8 | The web demo uses separate `demo:` browser storage. | `demo-isolation` |
 | 15 | Use Reset demo to restore its sample or Start for real to remove demo data. | `demo-isolation` |
+| 11 | Leaving the demo through another site link also removes its data. | `demo-isolation` |
 | 7 | See `.factory/demo.md` for the full sandbox contract. | documentation |
 | 8 | Start an isolated Collector with an OTLP/HTTP receiver. | instruction |
 | 10 | Then replay an OTLP JSON payload or newline-delimited JSON bodies. | `bounded-replay` |
@@ -140,10 +141,9 @@ Commands, headings, URL labels, and exit-code labels are excluded. Each prose se
 | 7 | The CLI creates no persistent telemetry copy. | `cli-data-boundary` |
 | 11 | It connects only to the test and metrics endpoints you choose. | `cli-data-boundary` |
 | 6 | Read the privacy and terms pages. | `legal-and-site-links` |
-| 9 | Collector Pressure Lab is independent of the OpenTelemetry project. | legal identity |
 | 6 | This project uses the MIT License. | `legal-and-site-links` |
 
-Privacy, terms, and 404 copy was also checked. Each sentence is 22 words or fewer, uses the same terms, and maps to the claim ids above or states safety/legal scope. The landing price fact and the terms-page free-software statement map to `free-to-use`.
+Privacy, terms, and 404 copy was also checked. Each sentence is 22 words or fewer, uses the same terms, and maps to the claim ids above or states safety/legal scope. The landing price fact and the terms-page free-software statement map to `free-to-use`. The privacy request-boundary sentences map to `no-request-identifiers`.
 
 ## Terminology
 

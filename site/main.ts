@@ -3,10 +3,22 @@ import { modelPressure, type ModelInput, type ModelResult } from "./model";
 
 const byId = <T extends HTMLElement>(id: string): T | null => document.getElementById(id) as T | null;
 const DEMO_KEY = "demo:cplab:pressure-input";
-const DEMO_INPUT: ModelInput = { arrivalRate: 900, exportCapacity: 420, queueCapacity: 1200, burstSeconds: 10 };
+const DEMO_INPUT: ModelInput = { arrivalRate: 900, exportCapacity: 400, queueCapacity: 1200, burstSeconds: 10 };
 
-function isDemoMode() {
-  return location.pathname.replace(/\/$/, "").startsWith("/demo") || new URLSearchParams(location.search).get("demo") === "1";
+function isDemoUrl(url = new URL(location.href)) {
+  return url.pathname.replace(/\/$/, "") === "/demo" || url.searchParams.get("demo") === "1";
+}
+
+function clearDemoInput() {
+  try {
+    localStorage.removeItem(DEMO_KEY);
+  } catch {
+    // The model still works in browsers that disable local storage.
+  }
+}
+
+function clearDemoInputOutsideDemo() {
+  if (!isDemoUrl()) clearDemoInput();
 }
 
 function updateNetworkState() {
@@ -65,12 +77,14 @@ function setupLab() {
   if (!form || !status) return;
   for (const control of form.querySelectorAll<HTMLInputElement>("input[type=range]")) {
     const readout = byId<HTMLOutputElement>(`${control.id}-value`);
-    const update = () => {
+    const updateReadout = () => {
       if (readout) readout.value = Number(control.value).toLocaleString();
-      if (isDemoMode()) saveDemoInput();
     };
-    control.addEventListener("input", update);
-    update();
+    control.addEventListener("input", () => {
+      updateReadout();
+      if (isDemoUrl()) saveDemoInput();
+    });
+    updateReadout();
   }
   const runModel = () => {
     status.textContent = "Model running…";
@@ -108,7 +122,11 @@ function currentInput(): ModelInput {
 }
 
 function saveDemoInput() {
-  localStorage.setItem(DEMO_KEY, JSON.stringify(currentInput()));
+  try {
+    localStorage.setItem(DEMO_KEY, JSON.stringify(currentInput()));
+  } catch {
+    // Demo persistence is optional when browser storage is unavailable.
+  }
 }
 
 function applyInput(input: ModelInput) {
@@ -121,12 +139,13 @@ function applyInput(input: ModelInput) {
     const control = byId<HTMLInputElement>(id);
     if (!control) continue;
     control.value = String(value);
-    control.dispatchEvent(new Event("input", { bubbles: true }));
+    const readout = byId<HTMLOutputElement>(`${control.id}-value`);
+    if (readout) readout.value = Number(control.value).toLocaleString();
   }
 }
 
 function setupDemo(runModel: (() => void) | undefined) {
-  if (!isDemoMode() || !runModel) return;
+  if (!isDemoUrl() || !runModel) return;
   const banner = byId<HTMLElement>("demo-banner");
   if (banner) banner.hidden = false;
   document.body.classList.add("demo-mode");
@@ -141,19 +160,24 @@ function setupDemo(runModel: (() => void) | undefined) {
     const saved = localStorage.getItem(DEMO_KEY);
     if (saved) input = { ...DEMO_INPUT, ...JSON.parse(saved) } as ModelInput;
   } catch {
-    localStorage.removeItem(DEMO_KEY);
+    clearDemoInput();
   }
   applyInput(input);
   saveDemoInput();
   runModel();
   byId<HTMLButtonElement>("reset-demo")?.addEventListener("click", () => {
-    localStorage.removeItem(DEMO_KEY);
+    clearDemoInput();
     applyInput(DEMO_INPUT);
     saveDemoInput();
     runModel();
     byId<HTMLElement>("model-status")!.textContent = "Demo reset to the bundled sample.";
   });
-  byId<HTMLAnchorElement>("exit-demo")?.addEventListener("click", () => localStorage.removeItem(DEMO_KEY));
+  document.addEventListener("click", (event) => {
+    const link = (event.target as Element | null)?.closest<HTMLAnchorElement>("a[href]");
+    if (!link) return;
+    const destination = new URL(link.href, location.href);
+    if (!isDemoUrl(destination)) clearDemoInput();
+  });
 }
 
 function focusRouteTarget() {
@@ -161,19 +185,20 @@ function focusRouteTarget() {
   const target = hashTarget?.querySelector<HTMLElement>("h2, h1") ?? hashTarget;
   const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
   const cameFromThisSite = document.referrer.startsWith(location.origin);
-  const shouldFocusHeading = isDemoMode() || location.pathname !== "/" || cameFromThisSite || navigation?.type === "back_forward";
+  const shouldFocusHeading = isDemoUrl() || location.pathname !== "/" || cameFromThisSite || navigation?.type === "back_forward";
   const focusTarget = target ?? (shouldFocusHeading ? document.querySelector<HTMLElement>("h1") : null);
   if (!focusTarget) return;
   focusTarget.tabIndex = -1;
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    const scrollTarget = hashTarget ?? (isDemoMode() ? byId<HTMLElement>("lab") : null);
-    const bannerOffset = isDemoMode() ? (byId<HTMLElement>("demo-banner")?.offsetHeight ?? 0) + 16 : 0;
+    const scrollTarget = hashTarget ?? (isDemoUrl() ? byId<HTMLElement>("lab") : null);
+    const bannerOffset = isDemoUrl() ? (byId<HTMLElement>("demo-banner")?.offsetHeight ?? 0) + 16 : 0;
     if (scrollTarget) window.scrollTo({ top: Math.max(0, scrollTarget.offsetTop - bannerOffset), behavior: "instant" });
     focusTarget.focus({ preventScroll: true });
     byId<HTMLElement>("route-announcer")!.textContent = focusTarget.textContent?.trim() ?? document.title;
   }));
 }
 
+clearDemoInputOutsideDemo();
 updateNetworkState();
 window.addEventListener("online", updateNetworkState);
 window.addEventListener("offline", updateNetworkState);
@@ -181,7 +206,10 @@ setupCopy();
 const runModel = setupLab();
 setupDemo(runModel);
 window.addEventListener("load", focusRouteTarget);
-window.addEventListener("pageshow", (event) => { if (event.persisted) focusRouteTarget(); });
+window.addEventListener("pageshow", (event) => {
+  clearDemoInputOutsideDemo();
+  if (event.persisted) focusRouteTarget();
+});
 window.addEventListener("hashchange", focusRouteTarget);
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {

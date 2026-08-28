@@ -1,10 +1,10 @@
 [
   {
     "id": "demo-isolation",
-    "claim": "The web demo is populated in one click, uses only demo-prefixed storage, resets, and the CLI demo writes only to a reported temporary directory.",
-    "where": "landing first screen, demo banner, README",
+    "claim": "The web demo is populated in one click, uses only demo-prefixed storage, resets to its initial sample, and discards demo data whenever the visitor leaves; the CLI demo writes only to a reported temporary directory.",
+    "where": "landing first screen, demo banner, privacy page, README",
     "test": "npm run test:claims -- --grep @claim:demo-isolation",
-    "sandbox": "fresh browser context and fresh temporary working directory; inspect storage keys, reset/exit behavior, CLI output path, and current-directory contents"
+    "sandbox": "fresh browser context at /demo and /?demo=1 plus a fresh temporary working directory; assert all four inputs and the complete result before and after reset, wordmark/privacy/Back/close exit cleanup, real-key survival, CLI output path, and current-directory contents"
   },
   {
     "id": "free-to-use",
@@ -91,11 +91,18 @@
     "sandbox": "fresh demo flow with all browser requests recorded, plus source scan for common tracking and remote-runtime hosts"
   },
   {
+    "id": "no-request-identifiers",
+    "claim": "The website sets no cookies or browser identifiers and adds no authorization, custom identity header, or identity query value to its requests.",
+    "where": "privacy page",
+    "test": "npm run test:claims -- --grep @claim:no-request-identifiers",
+    "sandbox": "fresh browser context through landing, demo, reset, exit, and privacy; capture every request URL and header, every Set-Cookie response, cookies, storage, IndexedDB, and identifier-generating source APIs"
+  },
+  {
     "id": "legal-and-site-links",
-    "claim": "Home, demo, privacy, terms, metadata, MIT license, and the styled 404 are published.",
+    "claim": "Home, demo, privacy, terms, route-specific metadata including the 404 Open Graph URL, MIT license, and the styled 404 are published.",
     "where": "site navigation, README",
     "test": "npm run test:claims -- --grep @claim:legal-and-site-links",
-    "sandbox": "fresh browser and HTTP client; assert route statuses, titles, canonical/social metadata, heading focus, 404 copy, and LICENSE text"
+    "sandbox": "fresh browser and HTTP client; assert route statuses, titles, canonical/social metadata including direct and unknown 404 URLs, heading focus, 404 copy, and LICENSE text"
   },
   {
     "id": "threshold-accuracy",

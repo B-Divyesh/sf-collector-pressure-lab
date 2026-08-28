@@ -25,7 +25,7 @@ createServer((request, response) => {
     ["/404", "404/index.html"], ["/404/", "404/index.html"],
   ]);
   let relative = known.get(pathname) ?? normalize(pathname).replace(/^[/\\]+/, "");
-  let status = pathname === "/404" || pathname === "/404/" ? 404 : 200;
+  let status = 200;
   try {
     if (!relative || !statSync(join(root, relative)).isFile()) throw new Error("missing");
   } catch {

@@ -84,32 +84,103 @@ function close(server: Server) {
   return new Promise<void>((done) => server.close(() => done()));
 }
 
-test("@claim:demo-isolation opens populated sample data and clears only its namespace", async ({ page }) => {
+test("@claim:demo-isolation opens and resets one sample, isolates storage, and discards demo changes on every exit", async ({ page, context }) => {
+  const sample = {
+    inputs: { arrival: "900", export: "400", queue: "1200", duration: "10" },
+    result: { classification: "Drops", offered: "9,000", queue: "1,200", dropped: "3,800", recovery: "3s" },
+  };
+  const readBrowserSample = async () => ({
+    inputs: {
+      arrival: await page.locator("#arrival-rate").inputValue(),
+      export: await page.locator("#export-capacity").inputValue(),
+      queue: await page.locator("#queue-capacity").inputValue(),
+      duration: await page.locator("#burst-seconds").inputValue(),
+    },
+    result: {
+      classification: await page.locator("#classification").textContent(),
+      offered: await page.locator("#offered-result").textContent(),
+      queue: await page.locator("#queue-result").textContent(),
+      dropped: await page.locator("#drop-result").textContent(),
+      recovery: await page.locator("#recovery-result").textContent(),
+    },
+  });
+  const mutateAllInputs = async () => {
+    await page.locator("#pressure-form").evaluate((form) => {
+      const values: Record<string, string> = {
+        "arrival-rate": "1200",
+        "export-capacity": "650",
+        "queue-capacity": "2000",
+        "burst-seconds": "12",
+      };
+      for (const [id, value] of Object.entries(values)) {
+        const input = form.querySelector<HTMLInputElement>(`#${id}`)!;
+        input.value = value;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    });
+  };
+  const expectStorage = async (hasDemo: boolean) => {
+    const stored = await page.evaluate(() => Object.fromEntries(Object.entries(localStorage)));
+    expect(stored["real:cplab:sentinel"]).toBe("keep");
+    expect(Object.hasOwn(stored, "demo:cplab:pressure-input")).toBe(hasDemo);
+  };
+
   await page.goto("/");
   await page.evaluate(() => localStorage.setItem("real:cplab:sentinel", "keep"));
   await page.getByRole("link", { name: "Try it with sample data" }).click();
   await expect(page).toHaveURL(/\/demo$/);
-  await expect(page).toHaveTitle("Demo — Collector Pressure Lab");
-  await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
-  await expect(page.locator("#classification")).toHaveText("Drops");
-  expect((await page.locator("#classification").boundingBox())!.y).toBeLessThan(page.viewportSize()!.height);
-  expect((await page.evaluate(() => Object.keys(localStorage))).sort()).toEqual(["demo:cplab:pressure-input", "real:cplab:sentinel"]);
-  await page.locator("#arrival-rate").evaluate((element: HTMLInputElement) => {
-    element.value = "1200";
-    element.dispatchEvent(new Event("input", { bubbles: true }));
-  });
-  await page.getByRole("button", { name: "Reset demo" }).click();
-  await expect(page.locator("#arrival-rate")).toHaveValue("900");
+  for (const entry of ["/demo", "/?demo=1"]) {
+    if (!page.url().endsWith(entry)) {
+      await page.goto("/");
+      await expectStorage(false);
+      await page.goto(entry);
+    }
+    await expect(page).toHaveTitle("Demo — Collector Pressure Lab");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://collector-pressure-lab.sociobot.in/demo");
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", "https://collector-pressure-lab.sociobot.in/demo");
+    await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
+    await expect(page.locator("#classification")).toHaveText("Drops");
+    expect((await page.locator("#classification").boundingBox())!.y).toBeLessThan(page.viewportSize()!.height);
+    const initial = await readBrowserSample();
+    expect(initial).toEqual(sample);
+    await mutateAllInputs();
+    await expect(page.locator("#burst-seconds")).toHaveValue("12");
+    await page.getByRole("button", { name: "Reset demo" }).click();
+    await expect(page.locator("#model-status")).toContainText("Model complete: Drops");
+    expect(await readBrowserSample()).toEqual(initial);
+    expect(await readBrowserSample()).toEqual(sample);
+    await expectStorage(true);
+  }
+
   await page.getByRole("link", { name: "Start for real" }).click();
   await expect(page).toHaveURL(/\/$/);
-  expect(await page.evaluate(() => Object.fromEntries(Object.entries(localStorage)))).toEqual({ "real:cplab:sentinel": "keep" });
-  await page.goto("/?demo=1");
-  await expect(page).toHaveTitle("Demo — Collector Pressure Lab");
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://collector-pressure-lab.sociobot.in/demo");
-  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", "https://collector-pressure-lab.sociobot.in/demo");
-  await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
-  await expect(page.locator("#classification")).toHaveText("Drops");
-  expect((await page.locator("#classification").boundingBox())!.y).toBeLessThan(page.viewportSize()!.height);
+  await expectStorage(false);
+
+  await page.goto("/demo");
+  await mutateAllInputs();
+  await page.getByRole("link", { name: "Collector Pressure Lab home" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expectStorage(false);
+
+  await page.goto("/demo");
+  await mutateAllInputs();
+  await page.getByRole("link", { name: "Privacy", exact: true }).first().click();
+  await expect(page).toHaveURL(/\/privacy\/$/);
+  await expectStorage(false);
+
+  await page.goto("/");
+  await page.getByRole("link", { name: "Try it with sample data" }).click();
+  await mutateAllInputs();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expectStorage(false);
+
+  await page.goto("/demo");
+  await mutateAllInputs();
+  await page.close();
+  page = await context.newPage();
+  await page.goto("/");
+  await expectStorage(false);
 
   const directory = mkdtempSync(join(tmpdir(), "cplab-claim-demo-"));
   const output = run(["demo"], directory);
@@ -371,17 +442,62 @@ test("@claim:no-third-party-runtime uses only same-origin website resources and 
   expect(sources).not.toMatch(/<link[^>]+rel=["'](?:stylesheet|preload|modulepreload)["'][^>]+href=["']https?:\/\//i);
 });
 
+test("@claim:no-request-identifiers adds no cookies, browser IDs, identity query values, or identity headers", async ({ page, context }) => {
+  const requests: Array<{ url: string; headers: Record<string, string> }> = [];
+  const responseCookies: string[] = [];
+  context.on("request", (request) => requests.push({ url: request.url(), headers: request.headers() }));
+  context.on("response", (response) => {
+    const setCookie = response.headers()["set-cookie"];
+    if (setCookie) responseCookies.push(setCookie);
+  });
+
+  await page.goto("/");
+  await page.getByRole("link", { name: "Try it with sample data" }).click();
+  await expect(page.locator("#classification")).toHaveText("Drops");
+  await page.getByRole("button", { name: "Reset demo" }).click();
+  await page.getByRole("link", { name: "Start for real" }).click();
+  await page.goto("/privacy/");
+  await expect(page.getByText("The site sets no cookies or browser identifiers.", { exact: false })).toBeVisible();
+  await expect(page.getByText("It adds no authorization or custom identity headers to requests.", { exact: false })).toBeVisible();
+
+  expect(responseCookies).toEqual([]);
+  expect(await context.cookies()).toEqual([]);
+  for (const request of requests) {
+    const url = new URL(request.url);
+    expect([...url.searchParams.keys()]).toEqual([]);
+    expect(Object.keys(request.headers)).not.toEqual(expect.arrayContaining([
+      "authorization", "cookie", "x-client-id", "x-device-id", "x-session-id", "x-user-id", "x-visitor-id",
+    ]));
+  }
+  expect(await page.evaluate(async () => ({
+    local: Object.keys(localStorage),
+    session: Object.keys(sessionStorage),
+    databases: await indexedDB.databases(),
+    cookie: document.cookie,
+  }))).toEqual({ local: [], session: [], databases: [], cookie: "" });
+  expect(readFileSync("site/main.ts", "utf8")).not.toMatch(/document\.cookie|randomUUID|getRandomValues|x-(?:client|device|session|user|visitor)-id/i);
+});
+
 test("@claim:legal-and-site-links serves route titles, metadata, legal pages, and a real 404", async ({ page, request }) => {
-  const routes = ["/", "/demo", "/privacy/", "/terms/"];
+  const routes = ["/", "/demo", "/privacy/", "/terms/", "/404"];
   for (const route of routes) expect((await request.get(route)).status()).toBe(200);
   expect((await request.get("/not-a-real-route")).status()).toBe(404);
   expect(readFileSync("LICENSE", "utf8")).toContain("Permission is hereby granted");
   expect(readFileSync("Cargo.toml", "utf8")).toContain('license = "MIT"');
-  for (const [route, title] of [["/", "Collector Pressure Lab — test Collector backpressure"], ["/demo", "Demo — Collector Pressure Lab"], ["/privacy/", "Privacy — Collector Pressure Lab"], ["/terms/", "Terms — Collector Pressure Lab"]]) {
+  expect(readFileSync("README.md", "utf8") + readFileSync("site/terms/index.html", "utf8"))
+    .not.toMatch(/independent of the OpenTelemetry project|do not imply endorsement/i);
+  for (const [route, title, socialUrl] of [
+    ["/", "Collector Pressure Lab — test Collector backpressure", "https://collector-pressure-lab.sociobot.in/"],
+    ["/demo", "Demo — Collector Pressure Lab", "https://collector-pressure-lab.sociobot.in/demo"],
+    ["/privacy/", "Privacy — Collector Pressure Lab", "https://collector-pressure-lab.sociobot.in/privacy/"],
+    ["/terms/", "Terms — Collector Pressure Lab", "https://collector-pressure-lab.sociobot.in/terms/"],
+    ["/404", "Page not found — Collector Pressure Lab", "https://collector-pressure-lab.sociobot.in/404"],
+  ]) {
     await page.goto(route);
     await expect(page).toHaveTitle(title);
     await expect(page.locator("h1")).toHaveCount(1);
     expect(await page.locator('link[rel="canonical"]').getAttribute("href")).toContain(route === "/" ? "sociobot.in/" : route.replace(/\/$/, ""));
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", socialUrl);
     expect(await page.locator('meta[property="og:image"]').getAttribute("content")).toContain("social-card.webp");
   }
   await page.goto("/privacy/");
@@ -395,6 +511,7 @@ test("@claim:legal-and-site-links serves route titles, metadata, legal pages, an
   expect(links.find((link) => link.href.startsWith("https://github.com"))?.text).toContain("opens external site");
   await page.goto("/not-a-real-route");
   await expect(page).toHaveTitle("Page not found — Collector Pressure Lab");
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", "https://collector-pressure-lab.sociobot.in/404");
   await expect(page.getByRole("heading", { level: 1, name: "This route stops here" })).toBeVisible();
 });
 

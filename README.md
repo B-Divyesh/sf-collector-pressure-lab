@@ -42,6 +42,7 @@ The final output prints that directory.
 
 The web demo uses separate `demo:` browser storage.
 Use **Reset demo** to restore its sample or **Start for real** to remove demo data.
+Leaving the demo through another site link also removes its data.
 See [.factory/demo.md](.factory/demo.md) for the full sandbox contract.
 
 ## Test a Collector
@@ -152,8 +153,6 @@ The site sends no analytics or third-party runtime requests.
 Outside demo mode, the browser model stores no inputs.
 The CLI creates no persistent telemetry copy. It connects only to the test and metrics endpoints you choose.
 Read the [privacy](https://collector-pressure-lab.sociobot.in/privacy/) and [terms](https://collector-pressure-lab.sociobot.in/terms/) pages.
-
-Collector Pressure Lab is independent of the OpenTelemetry project.
 
 ## License
 

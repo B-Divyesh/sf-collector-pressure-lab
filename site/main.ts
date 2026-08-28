@@ -165,7 +165,9 @@ function focusRouteTarget() {
   if (!focusTarget) return;
   focusTarget.tabIndex = -1;
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    if (hashTarget) window.scrollTo({ top: hashTarget.offsetTop, behavior: "instant" });
+    const scrollTarget = hashTarget ?? (isDemoMode() ? byId<HTMLElement>("lab") : null);
+    const bannerOffset = isDemoMode() ? (byId<HTMLElement>("demo-banner")?.offsetHeight ?? 0) + 16 : 0;
+    if (scrollTarget) window.scrollTo({ top: Math.max(0, scrollTarget.offsetTop - bannerOffset), behavior: "instant" });
     focusTarget.focus({ preventScroll: true });
     byId<HTMLElement>("route-announcer")!.textContent = focusTarget.textContent?.trim() ?? document.title;
   }));

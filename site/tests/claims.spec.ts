@@ -183,9 +183,19 @@ test("@claim:classification reports stable, backpressure, complete drops, and sc
   const report = JSON.parse(drops.stdout);
   expect(report.classification).toBe("drops");
   expect(report.steps[0].dropped).toBe(report.steps[0].attempted);
+  expect(report.hypotheses.length).toBeGreaterThan(0);
 
-  const backpressure = spawnSync("cargo", ["test", "--test", "pressure_fixture", "slow_exporter_is_backpressure_and_threshold_tracks_throughput", "--", "--exact"], { encoding: "utf8", timeout: 120_000 });
+  const backpressure = spawnSync("cargo", ["test", "--test", "pressure_fixture"], { encoding: "utf8", timeout: 120_000 });
   expect(backpressure.status).toBe(0);
+  expect(backpressure.stdout + backpressure.stderr).toContain("3 passed");
+  const metrics = spawnSync("cargo", ["test", "tests::parses_metrics_by_signal_sum", "--", "--exact"], { encoding: "utf8", timeout: 120_000 });
+  expect(metrics.status).toBe(0);
+  const unavailable = await receiver();
+  const unavailableEndpoint = unavailable.endpoint;
+  await close(unavailable.server);
+  const failed = run(["run", "--config", config, "--sample", sample, "--endpoint", unavailableEndpoint, "--metrics-endpoint", "off", "--rates", "1", "--duration", "250ms", "--timeout", "50ms", "--ci"]);
+  expect(failed.status).toBe(3);
+  expect(failed.stderr).toContain("no HTTP responses were received");
 });
 
 test("@claim:no-config-write leaves config and sample bytes unchanged on every CLI path", async ({}, testInfo) => {
@@ -193,6 +203,10 @@ test("@claim:no-config-write leaves config and sample bytes unchanged on every C
   const files = [config, sample];
   const before = files.map((file) => createHash("sha256").update(readFileSync(file)).digest("hex"));
   expect(run(["inspect", "--config", config, "--json"]).status).toBe(0);
+  const fixture = await receiver();
+  const replay = await runAsync(["run", "--config", config, "--sample", sample, "--endpoint", fixture.endpoint, "--metrics-endpoint", "off", "--rates", "1", "--duration", "250ms", "--json", "--ci"]);
+  await close(fixture.server);
+  expect(replay.code).toBe(0);
   expect(run(["demo"]).status).toBe(0);
   const after = files.map((file) => createHash("sha256").update(readFileSync(file)).digest("hex"));
   expect(after).toEqual(before);
@@ -208,6 +222,12 @@ test("@claim:package-and-tests builds one documented binary and a publishable Ca
   const packaged = spawnSync("cargo", ["package", "--allow-dirty"], { encoding: "utf8", timeout: 120_000 });
   expect(packaged.status).toBe(0);
   expect(readFileSync("Cargo.toml", "utf8").match(/\[\[bin\]\]/g)).toHaveLength(1);
+  const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
+  expect(packageJson.scripts.test).toContain("cargo test");
+  expect(packageJson.scripts.test).toContain("test:unit");
+  expect(packageJson.scripts.test).toContain("build:site");
+  expect(packageJson.scripts.test).toContain("test:e2e");
+  expect(readFileSync("tests/pressure_fixture.rs", "utf8")).toContain("slow_exporter_is_backpressure_and_threshold_tracks_throughput");
 });
 
 test("@claim:no-third-party-runtime uses only same-origin website resources and no tracking code", async ({ page, context }) => {
@@ -218,6 +238,7 @@ test("@claim:no-third-party-runtime uses only same-origin website resources and 
   expect(requests.every((url) => new URL(url).origin === "http://127.0.0.1:4173")).toBe(true);
   const sources = ["site/index.html", "site/main.ts", "site/style.css"].map((file) => readFileSync(file, "utf8")).join("\n");
   expect(sources).not.toMatch(/google-analytics|googletagmanager|segment\.com|mixpanel|fonts\.googleapis|openai\.azure\.com/i);
+  expect(readFileSync("Cargo.toml", "utf8")).not.toMatch(/^opentelemetry\s*=/m);
 });
 
 test("@claim:legal-and-site-links serves route titles, metadata, legal pages, and a real 404", async ({ page, request }) => {
@@ -226,11 +247,22 @@ test("@claim:legal-and-site-links serves route titles, metadata, legal pages, an
   expect((await request.get("/not-a-real-route")).status()).toBe(404);
   expect(readFileSync("LICENSE", "utf8")).toContain("Permission is hereby granted");
   expect(readFileSync("Cargo.toml", "utf8")).toContain('license = "MIT"');
+  for (const [route, title] of [["/", "Collector Pressure Lab — test Collector backpressure"], ["/demo", "Demo — Collector Pressure Lab"], ["/privacy/", "Privacy — Collector Pressure Lab"], ["/terms/", "Terms — Collector Pressure Lab"]]) {
+    await page.goto(route);
+    await expect(page).toHaveTitle(title);
+    await expect(page.locator("h1")).toHaveCount(1);
+    expect(await page.locator('link[rel="canonical"]').getAttribute("href")).toContain(route === "/" ? "sociobot.in/" : route.replace(/\/$/, ""));
+    expect(await page.locator('meta[property="og:image"]').getAttribute("content")).toContain("social-card.webp");
+  }
   await page.goto("/privacy/");
-  await expect(page).toHaveTitle("Privacy — Collector Pressure Lab");
   await expect(page.locator("h1")).toBeFocused();
-  expect(await page.locator('link[rel="canonical"]').getAttribute("href")).toContain("/privacy/");
-  expect(await page.locator('meta[property="og:image"]').getAttribute("content")).toContain("social-card.webp");
+  await page.goto("/");
+  const links = await page.locator("a[href]").evaluateAll((anchors) => anchors.map((anchor) => ({ href: anchor.getAttribute("href") ?? "", text: anchor.textContent?.trim() ?? "" })));
+  for (const link of links) {
+    if (link.href.startsWith("#")) expect(await page.locator(link.href).count()).toBe(1);
+    if (link.href.startsWith("/")) expect((await request.get(link.href)).status()).toBe(200);
+  }
+  expect(links.find((link) => link.href.startsWith("https://github.com"))?.text).toContain("opens external site");
   await page.goto("/not-a-real-route");
   await expect(page).toHaveTitle("Page not found — Collector Pressure Lab");
   await expect(page.getByRole("heading", { level: 1, name: "This route stops here" })).toBeVisible();

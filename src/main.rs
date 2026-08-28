@@ -148,7 +148,9 @@ fn execute(cli: Cli) -> Result<(), (u8, String)> {
             };
             experiment.validate().map_err(|e| (2, e))?;
             if experiment.allow_remote {
-                eprintln!("WARNING: remote endpoint override enabled; samples will be sent to the chosen endpoint.");
+                eprintln!(
+                    "WARNING: remote endpoint override enabled; samples will be sent to the chosen endpoint."
+                );
             }
             if !args.ci && !args.json {
                 eprintln!(

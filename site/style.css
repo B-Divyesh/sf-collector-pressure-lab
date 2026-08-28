@@ -74,7 +74,7 @@ h1 em { display: block; margin-top: 14px; color: var(--brass); font-style: norma
 .poster-frame figcaption { padding: 12px 4px 0; color: var(--fog); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
 .poster-label { position: absolute; z-index: 1; inset: 28px 28px auto; display: flex; justify-content: space-between; color: var(--paper); font-family: var(--display); font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
 .poster-label b { color: var(--brass); font-size: 30px; line-height: 1; }
-@keyframes poster-arrive { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes poster-arrive { from { transform: translateY(10px); } to { transform: none; } }
 
 .notice { width: min(1200px, calc(100% - 48px)); margin: 0 auto; padding: 20px 24px; display: flex; gap: 20px; background: var(--paper); color: var(--ink); border-left: 8px solid var(--ember); }
 .notice strong { font-family: var(--display); text-transform: uppercase; white-space: nowrap; }
@@ -178,6 +178,7 @@ footer nav { flex-wrap: wrap; justify-content: flex-end; gap: 8px 20px; }
   .route-list { grid-template-columns: 1fr; gap: 42px; }
   .route-list li:not(:last-child)::after { bottom: -42px; }
   .boundary-grid { grid-template-columns: 1fr; }
+  .demo-mode .model-output { order: -1; }
   footer { grid-template-columns: 1fr; padding-block: 40px; }
 }
 
@@ -194,7 +195,7 @@ footer nav { flex-wrap: wrap; justify-content: flex-end; gap: 8px 20px; }
   .hero-actions .secondary { display: none; }
   .action-hint { align-self: flex-start; }
   .hero-facts { display: grid; gap: 4px; margin-top: 18px; }
-  .demo-banner { position: relative; flex-wrap: wrap; justify-content: flex-start; gap: 6px 10px; padding: 10px 16px; }
+  .demo-banner { position: sticky; flex-wrap: wrap; justify-content: flex-start; gap: 6px 10px; padding: 10px 16px; }
   .demo-banner strong { width: 100%; }
   .demo-banner span { flex: 1 1 100%; }
   .notice { margin-top: 0; padding: 18px; flex-direction: column; gap: 4px; }

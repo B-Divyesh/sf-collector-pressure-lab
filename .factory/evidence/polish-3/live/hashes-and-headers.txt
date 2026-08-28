@@ -1,0 +1,33 @@
+Deployment source commit: 4fc6c70
+Live URL: https://collector-pressure-lab.sociobot.in
+
+Matching SHA-256 (local dist and live response):
+index.html 95779262883ca42baf3102b8bfa8e6a453265190713bb44f6b295fe579687517
+sw.js cf3a24d2ab7d297212a40457ef0d1da5b6a25905acbd62b8a5c6e1c98dfba9de
+main-CwevREUc.css 421b81c80fdf37c3516172dbe2e822500536878ddf9e00642cf54c9bc8bb3113
+main-DJTnKsdk.js efa9cf8f4e4e056790e9b83cc8b73ab951bc75de0eb583778639a649cdf666a9
+pressure-line.webp 3dccf4c508be7097cadb5110ee0f707fcef21fbaa7b636d04f14af3bb286e62b
+
+Root response:
+HTTP 200
+Cache-Control: public, must-revalidate, max-age=30
+Content-Security-Policy: default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'
+Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()
+Referrer-Policy: strict-origin-when-cross-origin
+X-Content-Type-Options: nosniff
+
+Hashed CSS response:
+HTTP 200
+Cache-Control: public, max-age=31536000, immutable
+
+Route status summary:
+200 /
+200 /demo
+200 /?demo=1
+200 /privacy/
+200 /terms/
+200 /404
+404 /missing-polish-3
+200 /robots.txt
+200 /sitemap.xml
+404 /staticwebapp.config.json

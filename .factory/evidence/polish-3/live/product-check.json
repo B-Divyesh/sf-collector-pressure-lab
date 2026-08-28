@@ -1,0 +1,30 @@
+{
+  "checked_at": "2026-08-28T14:03:00Z",
+  "base_url": "https://collector-pressure-lab.sociobot.in",
+  "viewports": ["1440x900", "390x844"],
+  "routes": {
+    "/": { "status": 200, "title": "Collector Pressure Lab — test Collector backpressure", "h1": 1, "main": 1, "axe_serious_or_critical": 0, "horizontal_overflow_px": 0 },
+    "/demo": { "status": 200, "title": "Demo — Collector Pressure Lab", "h1": 1, "main": 1, "axe_serious_or_critical": 0, "horizontal_overflow_px": 0 },
+    "/?demo=1": { "status": 200, "title": "Demo — Collector Pressure Lab", "h1": 1, "main": 1, "axe_serious_or_critical": 0, "horizontal_overflow_px": 0 },
+    "/privacy/": { "status": 200, "title": "Privacy — Collector Pressure Lab", "h1": 1, "main": 1, "axe_serious_or_critical": 0, "horizontal_overflow_px": 0 },
+    "/terms/": { "status": 200, "title": "Terms — Collector Pressure Lab", "h1": 1, "main": 1, "axe_serious_or_critical": 0, "horizontal_overflow_px": 0 },
+    "/404": { "status": 200, "title": "Page not found — Collector Pressure Lab", "h1": 1, "main": 1, "axe_serious_or_critical": 0, "horizontal_overflow_px": 0 },
+    "/missing-polish-3": { "status": 404, "title": "Page not found — Collector Pressure Lab", "h1": 1, "main": 1, "axe_serious_or_critical": 0, "horizontal_overflow_px": 0 }
+  },
+  "first_screen_mobile": { "facts_bottom_px": 752.0625, "viewport_height_px": 844 },
+  "demo": {
+    "first_click_url": "https://collector-pressure-lab.sociobot.in/demo",
+    "classification": "Drops",
+    "dropped_items": 500,
+    "banner": "Demo — sample data, nothing is saved",
+    "reset_arrival_rate": 900,
+    "real_sentinel_survived_entry_reset_and_exit": true,
+    "demo_key_removed_on_exit": true,
+    "query_entry_title": "Demo — Collector Pressure Lab",
+    "query_entry_canonical": "https://collector-pressure-lab.sociobot.in/demo",
+    "same_origin_requests_only": true
+  },
+  "offline": { "service_worker_controller": true, "demo_banner_visible": true, "classification_after_reload": "Drops" },
+  "navigation": { "deep_link_active_id": "cli-title", "deep_link_top_px": 0.28125, "back_active_id": "hero-title", "reduced_motion_duration": "1e-06s", "small_targets": [] },
+  "valid_route_console_errors": []
+}

@@ -1,0 +1,11 @@
+{
+  "url": "https://collector-pressure-lab.sociobot.in",
+  "lighthouse_version": "12.8.2",
+  "performance": 100,
+  "accessibility": 100,
+  "best_practices": 100,
+  "seo": 100,
+  "lcp_ms": 1351.673,
+  "cls": 0,
+  "tbt_ms": 0
+}

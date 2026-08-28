@@ -1,0 +1,185 @@
+{
+  "base": "https://collector-pressure-lab.sociobot.in",
+  "routes": {
+    "mobile:/": {
+      "status": 200,
+      "title": "Collector Pressure Lab — test Collector backpressure",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "mobile:/demo": {
+      "status": 200,
+      "title": "Demo — Collector Pressure Lab",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/demo",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "mobile:/?demo=1": {
+      "status": 200,
+      "title": "Demo — Collector Pressure Lab",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/demo",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "mobile:/privacy/": {
+      "status": 200,
+      "title": "Privacy — Collector Pressure Lab",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/privacy/",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "mobile:/terms/": {
+      "status": 200,
+      "title": "Terms — Collector Pressure Lab",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/terms/",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "mobile:/404": {
+      "status": 200,
+      "title": "Page not found — Collector Pressure Lab",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/404",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "desktop:/": {
+      "status": 200,
+      "title": "Collector Pressure Lab — test Collector backpressure",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "desktop:/demo": {
+      "status": 200,
+      "title": "Demo — Collector Pressure Lab",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/demo",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "desktop:/?demo=1": {
+      "status": 200,
+      "title": "Demo — Collector Pressure Lab",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/demo",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "desktop:/privacy/": {
+      "status": 200,
+      "title": "Privacy — Collector Pressure Lab",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/privacy/",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "desktop:/terms/": {
+      "status": 200,
+      "title": "Terms — Collector Pressure Lab",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/terms/",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    },
+    "desktop:/404": {
+      "status": 200,
+      "title": "Page not found — Collector Pressure Lab",
+      "overflow": 0,
+      "smallTargets": [],
+      "axeViolations": 0,
+      "canonical": "https://collector-pressure-lab.sociobot.in/404",
+      "csp": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'",
+      "permissionsPolicy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()"
+    }
+  },
+  "firstScreen": {
+    "mobile": {
+      "scrollY": 0,
+      "headline": "FIND YOUR COLLECTOR'S\nPRESSURE THRESHOLD",
+      "lede": "For OpenTelemetry operators testing when a local Collector queues, slows, or drops telemetry.",
+      "hint": "Loads the bundled sample and shows the result.",
+      "facts": [
+        "Free to use.",
+        "Works offline after the first visit.",
+        "Runs against loopback by default."
+      ],
+      "factsBottom": 752.0625,
+      "viewportHeight": 844
+    },
+    "desktop": {
+      "scrollY": 0,
+      "headline": "FIND YOUR COLLECTOR'S\nPRESSURE THRESHOLD",
+      "lede": "For OpenTelemetry operators testing when a local Collector queues, slows, or drops telemetry.",
+      "hint": "Loads the bundled sample and shows the result.",
+      "facts": [
+        "Free to use.",
+        "Works offline after the first visit.",
+        "Runs against loopback by default."
+      ],
+      "factsBottom": 859.59375,
+      "viewportHeight": 900
+    }
+  },
+  "demo": {
+    "mobile": {
+      "storage": [
+        "demo:cplab:pressure-input"
+      ],
+      "resetRate": "900",
+      "queryDemo": "Drops"
+    },
+    "desktop": {
+      "storage": [
+        "demo:cplab:pressure-input"
+      ],
+      "resetRate": "900",
+      "queryDemo": "Drops"
+    }
+  },
+  "focus": {
+    "mobile": {
+      "privacyFocused": true,
+      "backFocused": "hero-title",
+      "hashFocused": "cli-title"
+    },
+    "desktop": {
+      "privacyFocused": true,
+      "backFocused": "hero-title",
+      "hashFocused": "cli-title"
+    }
+  },
+  "offline": {
+    "controller": true,
+    "result": "Drops"
+  }
+}

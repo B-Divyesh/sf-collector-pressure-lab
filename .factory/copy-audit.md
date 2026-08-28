@@ -1,4 +1,4 @@
-# Copy audit — perfection loop round 3
+# Copy audit — perfection loop round 4
 
 Audited 2026-08-28. Words are whitespace-delimited; hyphenated terms count as one word. No sentence exceeds 22 words. No sentence uses a banned marketing word. Every visitor-facing factual promise maps to a claim below; instructions and scope warnings are marked “instruction” or “scope.”
 
@@ -143,7 +143,7 @@ Commands, headings, URL labels, and exit-code labels are excluded. Each prose se
 | 9 | Collector Pressure Lab is independent of the OpenTelemetry project. | legal identity |
 | 6 | This project uses the MIT License. | `legal-and-site-links` |
 
-Privacy, terms, and 404 copy was also checked. Each sentence is 22 words or fewer, uses the same terms, and maps to the claim ids above or states safety/legal scope.
+Privacy, terms, and 404 copy was also checked. Each sentence is 22 words or fewer, uses the same terms, and maps to the claim ids above or states safety/legal scope. The landing price fact and the terms-page free-software statement map to `free-to-use`.
 
 ## Terminology
 

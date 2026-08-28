@@ -1,0 +1,14 @@
+{
+  "url": "https://collector-pressure-lab.sociobot.in/",
+  "loadMs": 829,
+  "errors": [],
+  "a11y": {
+    "title": "Collector Pressure Lab — test Collector backpressure",
+    "lang": "en",
+    "h1": 1,
+    "main": true,
+    "imgsMissingAlt": 0,
+    "buttonsUnlabeled": 0,
+    "textLength": 2851
+  }
+}

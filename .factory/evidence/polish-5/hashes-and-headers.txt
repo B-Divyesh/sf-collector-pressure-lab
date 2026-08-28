@@ -1,0 +1,19 @@
+Collector Pressure Lab — polish 5 deployed artifact evidence
+Date: 2026-08-28 UTC
+Live URL: https://collector-pressure-lab.sociobot.in/
+Deployment: Azure Static Web Apps resource sf-collector-pressure-lab, production
+
+Local dist/site and live SHA-256 hashes match
+- index.html: d3c287854dc34e4e2ad67046060493869a432aa44b4cf94b4ce1894b2b489028
+- sw.js: 637c254e49da4e4000ac51dda79ac823fe5b28fec4847289a69d2eabe424b059
+- assets/main-B6JBUF0d.js: 1dede6e89d76025567c20b1e5abc65714392ffd31e704adde72bfa70fc3963fa
+- assets/main-CwevREUc.css: 421b81c80fdf37c3516172dbe2e822500536878ddf9e00642cf54c9bc8bb3113
+
+Cold live response checks
+- /, /demo, /privacy/, /terms/, and /404: expected documents and HTTP status
+- /missing-polish-5: HTTP 404 with the designed 404 document
+- Hashed JavaScript and CSS: Cache-Control public,max-age=31536000,immutable
+- Service worker: no-cache
+- HTML responses: restrictive same-origin Content-Security-Policy
+- HTML responses: Permissions-Policy, Referrer-Policy, and X-Content-Type-Options present
+- The displayed build marker is polish-5.

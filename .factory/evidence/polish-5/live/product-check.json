@@ -1,0 +1,355 @@
+{
+  "baseUrl": "https://collector-pressure-lab.sociobot.in",
+  "routes": [
+    {
+      "viewport": "desktop",
+      "route": "/",
+      "status": 200,
+      "title": "Collector Pressure Lab — test Collector backpressure",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/",
+      "overflow": 0,
+      "focused": "BODY",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/demo",
+      "status": 200,
+      "title": "Demo — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/demo",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/demo",
+      "overflow": 0,
+      "focused": "hero-title",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/?demo=1",
+      "status": 200,
+      "title": "Demo — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/demo",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/demo",
+      "overflow": 0,
+      "focused": "hero-title",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/privacy/",
+      "status": 200,
+      "title": "Privacy — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/privacy/",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/privacy/",
+      "overflow": 0,
+      "focused": "H1",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/terms/",
+      "status": 200,
+      "title": "Terms — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/terms/",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/terms/",
+      "overflow": 0,
+      "focused": "H1",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/404",
+      "status": 200,
+      "title": "Page not found — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/404",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/404",
+      "overflow": 0,
+      "focused": "H1",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/missing-polish-5",
+      "status": 404,
+      "title": "Page not found — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/404",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/404",
+      "overflow": 0,
+      "focused": "H1",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/",
+      "status": 200,
+      "title": "Collector Pressure Lab — test Collector backpressure",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/",
+      "overflow": 0,
+      "focused": "BODY",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/demo",
+      "status": 200,
+      "title": "Demo — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/demo",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/demo",
+      "overflow": 0,
+      "focused": "hero-title",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/?demo=1",
+      "status": 200,
+      "title": "Demo — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/demo",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/demo",
+      "overflow": 0,
+      "focused": "hero-title",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/privacy/",
+      "status": 200,
+      "title": "Privacy — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/privacy/",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/privacy/",
+      "overflow": 0,
+      "focused": "H1",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/terms/",
+      "status": 200,
+      "title": "Terms — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/terms/",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/terms/",
+      "overflow": 0,
+      "focused": "H1",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/404",
+      "status": 200,
+      "title": "Page not found — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/404",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/404",
+      "overflow": 0,
+      "focused": "H1",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/missing-polish-5",
+      "status": 404,
+      "title": "Page not found — Collector Pressure Lab",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "canonical": "https://collector-pressure-lab.sociobot.in/404",
+      "ogUrl": "https://collector-pressure-lab.sociobot.in/404",
+      "overflow": 0,
+      "focused": "H1",
+      "seriousAxe": 0,
+      "smallTargets": [],
+      "consoleErrors": []
+    }
+  ],
+  "demo": {
+    "initial": {
+      "inputs": [
+        "900",
+        "400",
+        "1200",
+        "10"
+      ],
+      "result": [
+        "Drops",
+        "9,000",
+        "1,200",
+        "3,800",
+        "3s"
+      ],
+      "storage": {
+        "real:cplab:sentinel": "keep",
+        "demo:cplab:pressure-input": "{\"arrivalRate\":900,\"exportCapacity\":400,\"queueCapacity\":1200,\"burstSeconds\":10}"
+      }
+    },
+    "reset": {
+      "inputs": [
+        "900",
+        "400",
+        "1200",
+        "10"
+      ],
+      "result": [
+        "Drops",
+        "9,000",
+        "1,200",
+        "3,800",
+        "3s"
+      ],
+      "storage": {
+        "real:cplab:sentinel": "keep",
+        "demo:cplab:pressure-input": "{\"arrivalRate\":900,\"exportCapacity\":400,\"queueCapacity\":1200,\"burstSeconds\":10}"
+      }
+    },
+    "resetMatchesInitial": true,
+    "queryInitial": {
+      "inputs": [
+        "900",
+        "400",
+        "1200",
+        "10"
+      ],
+      "result": [
+        "Drops",
+        "9,000",
+        "1,200",
+        "3,800",
+        "3s"
+      ],
+      "storage": {
+        "real:cplab:sentinel": "keep",
+        "demo:cplab:pressure-input": "{\"arrivalRate\":900,\"exportCapacity\":400,\"queueCapacity\":1200,\"burstSeconds\":10}"
+      }
+    },
+    "queryReset": {
+      "inputs": [
+        "900",
+        "400",
+        "1200",
+        "10"
+      ],
+      "result": [
+        "Drops",
+        "9,000",
+        "1,200",
+        "3,800",
+        "3s"
+      ],
+      "storage": {
+        "real:cplab:sentinel": "keep",
+        "demo:cplab:pressure-input": "{\"arrivalRate\":900,\"exportCapacity\":400,\"queueCapacity\":1200,\"burstSeconds\":10}"
+      }
+    },
+    "queryResetMatchesInitial": true,
+    "exitPaths": {
+      "privacy": {
+        "real:cplab:sentinel": "keep"
+      },
+      "wordmark": {
+        "real:cplab:sentinel": "keep"
+      },
+      "back": {
+        "real:cplab:sentinel": "keep"
+      },
+      "closeAndReopen": {
+        "real:cplab:sentinel": "keep"
+      }
+    },
+    "sameOriginRequests": true,
+    "requestsAddNoIdentityValues": true,
+    "cookies": []
+  },
+  "navigation": {
+    "privacyFocus": {
+      "focused": "Privacy",
+      "announced": "Privacy"
+    },
+    "backFocus": {
+      "focused": "hero-title",
+      "announced": "Find your Collector's pressure threshold"
+    },
+    "hashFocus": {
+      "focused": "cli-title",
+      "top": 0.28125,
+      "announced": "Test your local Collector from the terminal"
+    }
+  },
+  "offline": {
+    "controlled": true,
+    "title": "Demo — Collector Pressure Lab",
+    "banner": true,
+    "classification": "Drops"
+  },
+  "screenshots": [
+    ".factory/evidence/polish-5/live/first-screen-desktop.png",
+    ".factory/evidence/polish-5/live/demo-desktop.png",
+    ".factory/evidence/polish-5/live/first-screen-mobile.png",
+    ".factory/evidence/polish-5/live/demo-mobile.png",
+    ".factory/evidence/polish-5/live/demo-query-mobile.png",
+    ".factory/evidence/polish-5/live/404-mobile.png"
+  ]
+}

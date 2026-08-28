@@ -1,0 +1,41 @@
+Collector Pressure Lab — polish 5 clean-clone evidence
+Date: 2026-08-28 UTC
+Source commit: b2f289c test: deepen route and live verification
+Clone: /tmp/cplab-polish5-final.teF95X
+
+Setup
+- npm ci: passed; 0 vulnerabilities
+
+Claim manifest
+- 16 entries in .factory/claims.json
+- Every manifest test command ran independently from the clean clone.
+- All 16 commands exited 0:
+  demo-isolation, free-to-use, offline-reload,
+  browser-no-network-or-storage, loopback-guard, bounded-replay,
+  config-inspection, classification, collector-metrics, cli-data-boundary,
+  no-config-write, package-and-tests, no-third-party-runtime,
+  no-request-identifiers, legal-and-site-links, threshold-accuracy.
+
+Full suite
+- npm test: passed
+- Rust unit tests: 4 passed
+- CLI contract tests: 4 passed
+- Pressure fixture tests: 3 passed
+- Rust doctests: 1 passed
+- Vitest site/deployment tests: 6 passed
+- Playwright claim/accessibility tests: 43 passed, 9 intentional duplicate-mobile skips
+
+Additional release gates
+- cargo fmt --check: passed
+- cargo clippy --all-targets --all-features -- -D warnings: passed
+- cargo build --release: passed
+- cargo package --allow-dirty: passed
+- Cargo package: 13 files, 68.4 KiB unpacked, 19.0 KiB compressed
+- npm run build:site: passed and produced dist/site
+- JavaScript: 6.64 kB raw, 2.72 kB gzip
+- CSS: 16.09 kB raw, 4.36 kB gzip
+- Hero image: 102,748 bytes
+- Self-hosted font payload: 0 bytes
+
+The strict Rust/package checks used the identical product source at e1c0ac7.
+The later b2f289c commit changes only verification code.

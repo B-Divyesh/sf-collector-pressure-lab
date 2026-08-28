@@ -482,6 +482,15 @@ test("@claim:legal-and-site-links serves route titles, metadata, legal pages, an
   const routes = ["/", "/demo", "/privacy/", "/terms/", "/404"];
   for (const route of routes) expect((await request.get(route)).status()).toBe(200);
   expect((await request.get("/not-a-real-route")).status()).toBe(404);
+  const robots = await request.get("/robots.txt");
+  expect(robots.status()).toBe(200);
+  expect(await robots.text()).toContain("Sitemap: https://collector-pressure-lab.sociobot.in/sitemap.xml");
+  const sitemap = await request.get("/sitemap.xml");
+  expect(sitemap.status()).toBe(200);
+  const sitemapText = await sitemap.text();
+  for (const route of ["/", "/demo", "/privacy/", "/terms/"]) {
+    expect(sitemapText).toContain(`https://collector-pressure-lab.sociobot.in${route}`);
+  }
   expect(readFileSync("LICENSE", "utf8")).toContain("Permission is hereby granted");
   expect(readFileSync("Cargo.toml", "utf8")).toContain('license = "MIT"');
   expect(readFileSync("README.md", "utf8") + readFileSync("site/terms/index.html", "utf8"))
@@ -496,9 +505,22 @@ test("@claim:legal-and-site-links serves route titles, metadata, legal pages, an
     await page.goto(route);
     await expect(page).toHaveTitle(title);
     await expect(page.locator("h1")).toHaveCount(1);
-    expect(await page.locator('link[rel="canonical"]').getAttribute("href")).toContain(route === "/" ? "sociobot.in/" : route.replace(/\/$/, ""));
+    await expect(page.locator("main")).toHaveCount(1);
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /\S+/);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", socialUrl);
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", socialUrl);
     expect(await page.locator('meta[property="og:image"]').getAttribute("content")).toContain("social-card.webp");
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
+    await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute("content", /Collector Pressure Lab/);
+    await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute("content", /\S+/);
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", /social-card\.webp/);
+    await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", "/favicon.svg");
+    await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", "/apple-touch-icon.png");
+    await expect(page.locator('nav[aria-label="Primary navigation"] a')).toHaveText([
+      "Demo", "Privacy", "Terms", "Try sample pressure test →",
+    ]);
+    await expect(page.locator("footer .build-note")).toContainText("Built by Param Factory · v0.1.0 · build polish-5");
   }
   await page.goto("/privacy/");
   await expect(page.locator("h1")).toBeFocused();
@@ -507,6 +529,7 @@ test("@claim:legal-and-site-links serves route titles, metadata, legal pages, an
   for (const link of links) {
     if (link.href.startsWith("#")) expect(await page.locator(link.href).count()).toBe(1);
     if (link.href.startsWith("/")) expect((await request.get(link.href)).status()).toBe(200);
+    if (link.href.startsWith("https://github.com")) expect((await request.get(link.href)).status()).toBe(200);
   }
   expect(links.find((link) => link.href.startsWith("https://github.com"))?.text).toContain("opens external site");
   await page.goto("/not-a-real-route");

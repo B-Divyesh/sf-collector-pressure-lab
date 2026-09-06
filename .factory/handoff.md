@@ -1,31 +1,28 @@
-# Collector Pressure Lab — review 6 handoff
+# Collector Pressure Lab — review 7 handoff
 
-Work order: `collector-pressure-lab-review-6`
-Reviewed source: `118d2ab971526bd9a19225fbeeba8aaf4d2247ba`
+Work order: `collector-pressure-lab-review-7`
+Implementation candidate: `e1c0ac780307d61a03bf134acc09d7e69064f77b`
+Documentation/report source: `9ad3f9ad24530cb140b5f0a91bedb2a5167a6d20`
 Live URL: <https://collector-pressure-lab.sociobot.in/>
 
 ## Status
 
-Review 6 is **PASS** with zero findings. No product code was changed. The full
-review, including the complete landing/README copy ledger, independent claims
-results, live browser evidence, and one-by-one history verification, is in
-[review-6.md](review-6.md).
+Review 7 is **PASS** with zero findings and zero untested claims. No product
+code was changed. The full review is in [review-7.md](review-7.md).
 
 ## Verification performed
 
-- Opened the deployed root cold at 390 × 844 and 1440 × 900 before scrolling.
-- Exercised the one-click browser demo, all four demo inputs/reset result,
-  isolation, wordmark/Privacy/Back/close exits, ordinary browser storage,
-  same-origin request interception, and offline service-worker reload.
-- Ran `target/debug/cplab demo` from an empty temporary current directory;
-  it wrote only to a reported temporary output directory.
-- Ran `npm test`: 4 Rust unit, 4 CLI contract, 3 pressure-fixture, 1 doctest,
-  6 Vitest, and 43 Playwright tests passed; 9 intentional duplicates skipped.
-- Ran every one of the 16 listed `npm run test:claims -- --grep @claim:<id>`
-  commands independently after `npm ci`; all passed.
-- Checked live route metadata, 404 status/design, focus/announcements, Back,
-  hash routing, links, headers, sitemap, and visual identity. Live Axe at 390
-  px found zero violations on home, demo, Privacy, Terms, and 404.
+- Opened the live root cold at 390 × 844 and 1440 × 900 before scrolling.
+- Exercised one-click demo population, exact reset, isolated storage and exit,
+  same-origin requests, and live offline service-worker reload.
+- Ran `npm ci`, `npm test`, and all 16 declared claim commands independently.
+- Ran Axe Playwright against live phone-size home, demo, Privacy, Terms, and
+  404; all had zero violations.
+- Packaged and installed `cplab` into a fresh consumer directory. Help,
+  inspection, demo, temporary-output behavior, and loopback recovery worked.
+- Matched current local build HTML, JS, CSS, worker, and hero asset hashes to
+  the live deployment. The source application matches the implementation
+  candidate; later commits are documentation/test evidence.
 
 ## Run again
 
@@ -34,6 +31,7 @@ npm ci
 npm test
 npm run test:claims
 npm run build:site
+cargo package
 cargo run -- demo
 ```
 
@@ -42,5 +40,5 @@ Playwright configuration.
 
 ## Known gaps and next steps
 
-None found in this review. The intentional limit remains: a bounded synthetic
-test is evidence for a next test, not a production-capacity guarantee.
+None found. The intentional limit remains: a bounded synthetic test is
+evidence for a next test, not a production-capacity guarantee.
